@@ -3,3 +3,7 @@
 name = "testu01"
 version = "0.0.1"
 authors = ["Loïc Damien <loic.damien@dzamlo.ch>"]
+
+[dependencies]
+
+libc = "*"
