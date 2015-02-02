@@ -1,9 +1,14 @@
+//! This module allows you to define generators than can be tested by TestU01.
+//! It doesn't covers the rest of the unif01 part of TestU01.
+
 use std::ffi::CString;
 use std::fmt;
 use std::ptr::null_mut;
 use std::rand::Rng;
 
 pub mod ffi {
+
+   /// This struct is what will be handed to TestU01 for testing.
    #[allow(non_camel_case_types)]
    #[allow(non_snake_case)]
    #[repr(C)]
@@ -19,6 +24,7 @@ pub mod ffi {
     impl Copy for raw_unif01_Gen {}
 }
 
+/// Any type than can be converted to ffi::raw_unif01_Gen should implement this trait
 pub trait WithRawUnif01Gen {
     fn with_raw<R, F>(&mut self, f: F) -> R where F: FnOnce(&mut ffi::raw_unif01_Gen) -> R;
 }
@@ -49,6 +55,7 @@ extern "C" fn write_wrapper<T: Unif01Methods>(gen: *mut ::libc::c_void) {
     let gen: &mut T = unsafe { &mut *(gen as *mut T) };
     gen.write();
 }
+
 
 pub struct Unif01Gen<T> {
     state: T,

@@ -1,3 +1,5 @@
+//! This crate is a wrapper around a small subset of TestU01.
+
 #![feature(collections)] 
 #![feature(libc)]
 #![feature(rand)]

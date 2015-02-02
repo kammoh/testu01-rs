@@ -1,3 +1,8 @@
+//! This module covers the bbattery part of TestU01. It allows you to apply predefined batteries of
+//! tests to a generator.
+//! To have more detail about each test and the meaning of each parameters, see the TestU01 manual.
+
+
 use std::ffi::{c_str_to_bytes, CString};
 use std::str;
 
@@ -107,6 +112,7 @@ pub fn repeat_block_alphabit<T: ::unif01::WithRawUnif01Gen>(gen: &mut T,  nb: ::
     gen.with_raw(wrapper);
 }
 
+/// Get the p-values of the tests of the last battery applied.
 pub fn get_pvalues() -> Vec<(String, f64)> {
     let _g = ::GLOBAL_LOCK.lock().unwrap();
     let len = unsafe { ffi::bbattery_NTests };

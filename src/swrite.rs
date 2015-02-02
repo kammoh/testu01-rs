@@ -1,3 +1,6 @@
+//! This module covers the swrite part of TestU01. It allows you to configure what is printed when
+//! tests are run.
+
 use std::ffi::CString;
 
 mod ffi {
