@@ -2,7 +2,7 @@ use std::ffi::CString;
 
 mod ffi {
     #[allow(non_camel_case_types)]
-    type lebool = ::libc::c_int;
+    pub type lebool = ::libc::c_int;
     
     #[link(name = "testu01")]
     extern "C" {
@@ -24,7 +24,7 @@ macro_rules! wrap {
     ($name:ident, $wrapped:path) => (
         pub fn $name(value: bool) { 
             let _g = ::GLOBAL_LOCK.lock().unwrap();
-            unsafe { $wrapped = value as ::libc::c_int };
+            unsafe { $wrapped = value as ffi::lebool };
         }
     );
 }
