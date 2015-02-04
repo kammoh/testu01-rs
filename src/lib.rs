@@ -12,6 +12,7 @@ use std::sync::{StaticMutex, MUTEX_INIT};
 /// This lock is here to protect access to all TestU01 global variables.
 static GLOBAL_LOCK: StaticMutex = MUTEX_INIT;
 
+pub mod decorators;
 pub mod battery;
 pub mod unif01;
 pub mod swrite;
