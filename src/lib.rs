@@ -1,5 +1,6 @@
 //! This crate is a wrapper around a small subset of TestU01.
 
+#![feature(core)]
 #![feature(libc)]
 #![feature(rand)]
 #![feature(std_misc)]
