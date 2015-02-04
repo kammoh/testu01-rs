@@ -121,8 +121,16 @@ pub fn get_pvalues() -> Vec<(String, f64)> {
     let mut pvalues = Vec::with_capacity(len);
     for i in 0..len {
         let pvalue = unsafe{ *ffi::bbattery_pVal.get_unchecked(i) };
-        let name = unsafe { c_str_to_bytes(ffi::bbattery_TestNames.get_unchecked(i)) };
-        let name = str::from_utf8(name).unwrap_or("").to_string();
+        let name = unsafe {
+            let ptr = ffi::bbattery_TestNames.get_unchecked(i);
+            if (*ptr).is_null() {
+                "".to_string()
+            }
+            else {
+               let name_bytes = c_str_to_bytes(ptr);
+               str::from_utf8(name_bytes).unwrap_or("").to_string()
+            }
+        };
         pvalues.push((name, pvalue))
     }
     return pvalues;
