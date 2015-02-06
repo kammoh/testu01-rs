@@ -1,7 +1,6 @@
 //! This crate is a wrapper around a small subset of TestU01.
 
 #![feature(core)]
-#![feature(libc)]
 #![feature(std_misc)]
 
 extern crate libc;
