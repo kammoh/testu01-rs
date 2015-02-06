@@ -24,7 +24,7 @@ fn main() {
     let name = "weak_rng";
     let c_name = CString::from_slice(name.as_bytes());
 
-    let rng = rand::XorShiftRng::new_unseeded(); // The generator tht will be tested.
+    let rng = rand::XorShiftRng::new_unseeded(); // The generator that will be tested.
 
     // Build an object than can  be converted to something that TestU01 can test:
     let mut xorshift_unif01 = Unif01Gen::new((rng, write), c_name); 
