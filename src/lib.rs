@@ -2,10 +2,10 @@
 
 #![feature(core)]
 #![feature(libc)]
-#![feature(rand)]
 #![feature(std_misc)]
 
 extern crate libc;
+extern crate rand;
 
 use std::sync::{StaticMutex, MUTEX_INIT};
 

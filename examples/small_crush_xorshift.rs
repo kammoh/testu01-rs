@@ -1,10 +1,9 @@
-#![feature(rand)]
 #![feature(std_misc)]
 
 extern crate testu01;
+extern crate rand;
 
 use std::ffi::CString;
-use std::rand;
 
 use testu01::unif01::Unif01Gen;
 use testu01::swrite;

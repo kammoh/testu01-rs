@@ -4,7 +4,7 @@
 use std::ffi::CString;
 use std::fmt;
 use std::ptr::null_mut;
-use std::rand::Rng;
+use rand::Rng;
 
 pub mod ffi {
 

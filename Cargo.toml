@@ -7,3 +7,4 @@ authors = ["Loïc Damien <loic.damien@dzamlo.ch>"]
 [dependencies]
 
 libc = "*"
+rand = "*"

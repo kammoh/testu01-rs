@@ -1,7 +1,7 @@
 //! This module doesn't wrap any part on TestU01. It provides decorators to help you test 
 //! your random number generators more thoroughly.
 
-use std::rand::Rng;
+use rand::Rng;
 
 
 /// A generator that reverse the order of the bits produced by another generator.
