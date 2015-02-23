@@ -19,7 +19,7 @@
 //! To have more detail about each test and the meaning of each parameters, see the TestU01 manual.
 
 
-use std::ffi::{CStr, CString};
+use std::ffi::CStr;
 use std::str;
 
 mod ffi {
@@ -75,10 +75,9 @@ macro_rules! wrap_file {
         wrap_file!($name, $wrapped, );
     );
     ($name:ident, $wrapped:path, $($arg_name:ident: $arg_type:ty),*) => (
-        pub fn $name<T: GenericPath>(path: &mut T, $($arg_name: $arg_type),*) { 
-            let c_path = CString::new(path.as_vec()).unwrap();
+        pub fn $name(path: &CStr, $($arg_name: $arg_type),*) { 
             let _g = ::GLOBAL_LOCK.lock().unwrap();
-            unsafe { $wrapped(c_path.as_ptr() $(, $arg_name)*) };
+            unsafe { $wrapped(path.as_ptr() $(, $arg_name)*) };
         }
     );
 }
