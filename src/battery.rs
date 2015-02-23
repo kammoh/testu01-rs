@@ -19,7 +19,7 @@
 //! To have more detail about each test and the meaning of each parameters, see the TestU01 manual.
 
 
-use std::ffi::{c_str_to_bytes, CString};
+use std::ffi::{CStr, CString};
 use std::str;
 
 mod ffi {
@@ -76,7 +76,7 @@ macro_rules! wrap_file {
     );
     ($name:ident, $wrapped:path, $($arg_name:ident: $arg_type:ty),*) => (
         pub fn $name<T: GenericPath>(path: &mut T, $($arg_name: $arg_type),*) { 
-            let c_path = CString::from_slice(path.as_vec());
+            let c_path = CString::new(path.as_vec()).unwrap();
             let _g = ::GLOBAL_LOCK.lock().unwrap();
             unsafe { $wrapped(c_path.as_ptr() $(, $arg_name)*) };
         }
@@ -141,9 +141,8 @@ pub fn get_pvalues() -> Vec<(String, f64)> {
             let ptr = ffi::bbattery_TestNames.get_unchecked(i);
             if (*ptr).is_null() {
                 "".to_string()
-            }
-            else {
-               let name_bytes = c_str_to_bytes(ptr);
+            } else {
+               let name_bytes = CStr::from_ptr(*ptr).to_bytes();
                str::from_utf8(name_bytes).unwrap_or("").to_string()
             }
         };

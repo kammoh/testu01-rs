@@ -33,11 +33,11 @@ fn write(gen: &mut rand::XorShiftRng) {
 
 fn main() {
     let experiment_name = "Test of rust weak rng with small crush";
-    swrite::set_experiment_name(&CString::from_slice(experiment_name.as_bytes()));
+    swrite::set_experiment_name(&CString::new(experiment_name).unwrap());
     swrite::set_host(false); // Disable the printing of the hostname in the results
 
     let name = "weak_rng";
-    let c_name = CString::from_slice(name.as_bytes());
+    let c_name = CString::new(name).unwrap();
 
     let rng = rand::XorShiftRng::new_unseeded(); // The generator that will be tested.
 
