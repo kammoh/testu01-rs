@@ -61,7 +61,7 @@ macro_rules! wrap {
     );
    ($name:ident, $wrapped:path, $($arg_name:ident: $arg_type:ty),*) => (
         pub fn $name<T: ::unif01::WithRawUnif01Gen>(gen: &mut T, $($arg_name: $arg_type),*) { 
-            let wrapper = |&: gen: &mut ::unif01::ffi::raw_unif01_Gen| {
+            let wrapper = |gen: &mut ::unif01::ffi::raw_unif01_Gen| {
                 let _g = ::GLOBAL_LOCK.lock().unwrap();
                 unsafe { $wrapped(gen $(, $arg_name)*) };
             };
@@ -88,7 +88,7 @@ macro_rules! wrap_rep {
     );
     ($name:ident, $wrapped:path, $rep:expr, $($arg_name:ident: $arg_type:ty),*) => (
         pub fn $name<T: ::unif01::WithRawUnif01Gen>(gen: &mut T $(, $arg_name: $arg_type)*, rep: &[::libc::c_int]) { 
-            let wrapper = |&: gen: &mut ::unif01::ffi::raw_unif01_Gen| {
+            let wrapper = |gen: &mut ::unif01::ffi::raw_unif01_Gen| {
                 let _g = ::GLOBAL_LOCK.lock().unwrap();
                 unsafe { $wrapped(gen  $(, $arg_name)*, rep.as_ptr()) };
             };
@@ -119,7 +119,7 @@ wrap_file!(fips_140_2_file, ffi::bbattery_FIPS_140_2File);
 
 // Not using wrap_rep! because bbattery_RepeatBlockAlphabit want another argument after the rep argument.
 pub fn repeat_block_alphabit<T: ::unif01::WithRawUnif01Gen>(gen: &mut T,  nb: ::libc::c_double, r: ::libc::c_int, s: ::libc::c_int, rep: &[::libc::c_int], w: ::libc::c_int) {
-    let wrapper = |&: gen: &mut ::unif01::ffi::raw_unif01_Gen| {
+    let wrapper = |gen: &mut ::unif01::ffi::raw_unif01_Gen| {
         let _g = ::GLOBAL_LOCK.lock().unwrap();
         unsafe { ffi::bbattery_RepeatBlockAlphabit(gen, nb, r, s, rep.as_ptr(), w) };
     };
