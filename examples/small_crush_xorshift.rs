@@ -1,27 +1,25 @@
 // A rust wrapper to a small subset of TestU01 (http://simul.iro.umontreal.ca/testu01/tu01.html).
 // Copyright (C) 2015  Loïc Damien
-// 
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-#![feature(std_misc)]
 
 extern crate testu01;
 extern crate rand;
 
 use std::ffi::CString;
 
-use testu01::unif01::Unif01Gen;
+use testu01::unif01::{Unif01Gen, Unif01Pair};
 use testu01::swrite;
 
 // XorShiftRng doesn't implement the Debug trait but we want to print its internal state.
@@ -42,11 +40,11 @@ fn main() {
     let rng = rand::XorShiftRng::new_unseeded(); // The generator that will be tested.
 
     // Build an object than can  be converted to something that TestU01 can test:
-    let mut xorshift_unif01 = Unif01Gen::new((rng, write), c_name); 
-    
+    let mut xorshift_unif01 = Unif01Gen::new(Unif01Pair(rng, write), c_name);
+
     // Apply the small crush battery to it:
     testu01::battery::small_crush(&mut xorshift_unif01);
-    
+
     // Print the p-values for the differents test of the battery:
-    println!("P-values: {:?}", testu01::battery::get_pvalues()); 
+    println!("P-values: {:?}", testu01::battery::get_pvalues());
 }

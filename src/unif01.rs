@@ -1,16 +1,16 @@
 // A rust wrapper to a small subset of TestU01 (http://simul.iro.umontreal.ca/testu01/tu01.html).
 // Copyright (C) 2015  Loïc Damien
-// 
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -36,8 +36,6 @@ pub mod ffi {
         pub GetBits: Option<extern "C" fn(param: *mut ::libc::c_void, state: *mut ::libc::c_void) -> ::libc::c_ulong>,
         pub Write: Option<extern "C" fn(state: *mut ::libc::c_void)>,
     }
-    
-    impl Copy for raw_unif01_Gen {}
 }
 
 /// Any type than can be converted to ffi::raw_unif01_Gen should implement this trait
@@ -86,7 +84,7 @@ impl<T> Unif01Gen<T> {
 }
 
 impl<T: Unif01Methods> WithRawUnif01Gen for Unif01Gen<T> {
-    fn with_raw<R, F>(&mut self, f: F) -> R 
+    fn with_raw<R, F>(&mut self, f: F) -> R
         where F: FnOnce(&mut ffi::raw_unif01_Gen) -> R {
         let mut raw = ffi::raw_unif01_Gen {
             state: &mut self.state as *mut T as *mut ::libc::c_void,
@@ -105,25 +103,27 @@ impl<T> Unif01Methods for T where T: Rng+fmt::Debug {
     fn get_u01(&mut self) -> f64 {
         self.gen::<f64>()
     }
-    
+
     fn get_bits(&mut self) -> u32 {
         self.gen::<u32>()
     }
-    
+
     fn write(&mut self) {
         println!("{:?}", self);
     }
 }
 
-impl<T, F> Unif01Methods for (T, F) where T: Rng, F: FnMut(&mut T) {
+pub struct Unif01Pair<T,F>(pub T, pub F);
+
+impl<T, F> Unif01Methods for Unif01Pair<T,F> where T: Rng, F: FnMut(&mut T) {
     fn get_u01(&mut self) -> f64 {
         self.0.gen::<f64>()
     }
-    
+
     fn get_bits(&mut self) -> u32 {
         self.0.gen::<u32>()
     }
-    
+
     fn write(&mut self) {
         self.1(&mut self.0)
     }
