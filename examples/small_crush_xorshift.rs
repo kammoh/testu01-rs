@@ -1,4 +1,5 @@
-// A rust wrapper to a small subset of TestU01 (http://simul.iro.umontreal.ca/testu01/tu01.html).
+// A rust wrapper to a small subset of TestU01
+// (http://simul.iro.umontreal.ca/testu01/tu01.html).
 // Copyright (C) 2015  Loïc Damien
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,11 +23,16 @@ use std::ffi::CString;
 use testu01::unif01::{Unif01Gen, Unif01Pair};
 use testu01::swrite;
 
-// XorShiftRng doesn't implement the Debug trait but we want to print its internal state.
+// XorShiftRng doesn't implement the Debug trait but we want to print its
+// internal state.
 // This is an ugly hack to access his private members and print them.
 fn write(gen: &mut rand::XorShiftRng) {
     let gen: &(u32, u32, u32, u32) = unsafe { std::mem::transmute(gen) };
-    println!("x: 0x{:x}, y: 0x{:x}, z: 0x{:x}, w: 0x{:x}", gen.0, gen.1, gen.2, gen.3)
+    println!("x: 0x{:x}, y: 0x{:x}, z: 0x{:x}, w: 0x{:x}",
+             gen.0,
+             gen.1,
+             gen.2,
+             gen.3)
 }
 
 fn main() {

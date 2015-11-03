@@ -1,4 +1,5 @@
-// A rust wrapper to a small subset of TestU01 (http://simul.iro.umontreal.ca/testu01/tu01.html).
+// A rust wrapper to a small subset of TestU01
+// (http://simul.iro.umontreal.ca/testu01/tu01.html).
 // Copyright (C) 2015  Loïc Damien
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,8 +24,8 @@ extern crate rand;
 
 use std::sync::{StaticMutex, MUTEX_INIT};
 
-/// Lot of TestU01 is inherently non thread-safe, updating/reading global variables without synchronization.
-/// This lock is here to protect access to all TestU01 global variables.
+/// Lot of TestU01 is inherently non thread-safe, updating/reading global variables without
+/// synchronization. This lock is here to protect access to all TestU01 global variables.
 static GLOBAL_LOCK: StaticMutex = MUTEX_INIT;
 
 pub mod decorators;
