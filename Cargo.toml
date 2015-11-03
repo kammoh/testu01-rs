@@ -6,5 +6,5 @@ authors = ["Loïc Damien <loic.damien@dzamlo.ch>"]
 
 [dependencies]
 
-libc = "*"
-rand = "*"
+libc = "0.2.0"
+rand = "0.3.11"
