@@ -1,4 +1,6 @@
 # rust-testu01
+[![Build Status](https://travis-ci.org/dzamlo/rust-testu01.svg?branch=master)](https://travis-ci.org/dzamlo/rust-testu01)
+
 A rust wrapper to a small subset of [TestU01].
 [TestU01]: http://simul.iro.umontreal.ca/testu01/tu01.html
 
