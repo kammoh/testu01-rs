@@ -17,16 +17,18 @@
 
 //! This crate is a wrapper around a small subset of TestU01.
 
- #![feature(static_mutex)]
-
+#[macro_use]
+extern crate lazy_static;
 extern crate libc;
 extern crate rand;
 
-use std::sync::{StaticMutex, MUTEX_INIT};
+use std::sync::Mutex;
 
-/// Lot of TestU01 is inherently non thread-safe, updating/reading global variables without
-/// synchronization. This lock is here to protect access to all TestU01 global variables.
-static GLOBAL_LOCK: StaticMutex = MUTEX_INIT;
+lazy_static! {
+    /// Lot of TestU01 is inherently non thread-safe, updating/reading global variables without
+    /// synchronization. This lock is here to protect access to all TestU01 global variables.
+    static ref GLOBAL_LOCK: Mutex<()> = Mutex::new(());
+}
 
 pub mod decorators;
 pub mod battery;
