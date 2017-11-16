@@ -19,7 +19,7 @@
 //! help you test
 //! your random number generators more thoroughly.
 
-use rand::Rng;
+use rand_core::{Rng, Error};
 
 
 /// A generator that reverse the order of the bits produced by another generator.
@@ -70,6 +70,19 @@ impl<T: Rng> Rng for ReverseBits<T> {
     fn next_u64(&mut self) -> u64 {
         reverse_bits64(self.rng.next_u64())
     }
+
+    #[cfg(feature = "i128_support")]
+    fn next_u128(&mut self) -> u128 {
+        panic!()
+    }
+    
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        panic!()
+    }
+
+    fn try_fill(&mut self, dest: &mut [u8]) -> Result<(), Error> {
+        panic!()
+    }
 }
 
 /// A generator that successively emit the upper the upper and lower half of the values produced
@@ -103,6 +116,23 @@ impl<T: Rng> Rng for Rng64To32<T> {
             self.lower_half = Some(n as u32);
             (n >> 32) as u32
         }
+    }
+
+    fn next_u64(&mut self) -> u64 {
+        self.rng.next_u64()
+    }
+
+    #[cfg(feature = "i128_support")]
+    fn next_u128(&mut self) -> u128 {
+        panic!()
+    }
+    
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        panic!()
+    }
+
+    fn try_fill(&mut self, dest: &mut [u8]) -> Result<(), Error> {
+        panic!()
     }
 }
 

@@ -17,10 +17,13 @@
 
 //! This crate is a wrapper around a small subset of TestU01.
 
+#![cfg_attr(feature = "i128_support", feature(i128_type))]
+
 #[macro_use]
 extern crate lazy_static;
 extern crate libc;
 extern crate rand;
+extern crate rand_core;
 
 use std::sync::Mutex;
 

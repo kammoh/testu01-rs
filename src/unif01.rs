@@ -21,7 +21,7 @@
 use std::ffi::CString;
 use std::fmt;
 use std::ptr::null_mut;
-use rand::Rng;
+use rand_core::Rng;
 
 pub mod ffi {
 
@@ -112,11 +112,11 @@ impl<T: Unif01Methods> WithRawUnif01Gen for Unif01Gen<T> {
 
 impl<T> Unif01Methods for T where T: Rng+fmt::Debug {
     fn get_u01(&mut self) -> f64 {
-        self.gen::<f64>()
+        self.next_u32() as f64 * (1.0/4294967296.0)
     }
 
     fn get_bits(&mut self) -> u32 {
-        self.gen::<u32>()
+        self.next_u32()
     }
 
     fn write(&mut self) {
@@ -128,11 +128,11 @@ pub struct Unif01Pair<T, F>(pub T, pub F);
 
 impl<T, F> Unif01Methods for Unif01Pair<T,F> where T: Rng, F: FnMut(&mut T) {
     fn get_u01(&mut self) -> f64 {
-        self.0.gen::<f64>()
+        self.0.next_u32() as f64 * (1.0/4294967296.0)
     }
 
     fn get_bits(&mut self) -> u32 {
-        self.0.gen::<u32>()
+        self.0.next_u32()
     }
 
     fn write(&mut self) {
