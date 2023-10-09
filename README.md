@@ -2,11 +2,9 @@
 
 Fork of [rust-testu01](https://github.com/dzamlo/rust-testu01.git), updated for current Rust versions and using internal sys wrapper crate.
 
-A rust wrapper to a subset of [TestU01].
-[TestU01]: http://simul.iro.umontreal.ca/testu01/tu01.html
+A rust wrapper to a subset of [TestU01](http://simul.iro.umontreal.ca/testu01/tu01.html)
 
-
-TestU01 is a software library, implemented in the ANSI C language, and offering 
+TestU01 is a software library offering 
 a collection of utilities for the empirical statistical testing of uniform random
 number generators.
 
