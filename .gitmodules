@@ -4,3 +4,9 @@
 [submodule "SP800-90B-sys/SP800-90B_EntropyAssessment"]
 	path = SP800-90B-sys/SP800-90B_EntropyAssessment
 	url = https://github.com/kammoh/SP800-90B_EntropyAssessment.git
+[submodule "sts"]
+	path = sts
+	url = https://github.com/arcetri/sts.git
+[submodule "practrand-sys/PractRand"]
+	path = practrand-sys/PractRand
+	url = https://github.com/kammoh/PractRand.git

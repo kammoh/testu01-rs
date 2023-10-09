@@ -1,11 +1,14 @@
 [workspace]
-members = [".", "testu01-sys", "SP800-90B-sys"]
+members = [".", "testu01-sys", "SP800-90B-sys", "practrand-sys"]
 resolver = "2"
 
 [package]
 name = "testu01"
 version = "0.1.0"
-authors = ["Loïc Damien <loic.damien@dzamlo.ch>", "Kamyar Mohajerani <kammoh@gmail.com>"]
+authors = [
+    "Loïc Damien <loic.damien@dzamlo.ch>",
+    "Kamyar Mohajerani <kammoh@gmail.com>",
+]
 edition = "2021"
 
 [dependencies]
