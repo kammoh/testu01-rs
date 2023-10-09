@@ -1,6 +1,5 @@
 use core::num::Wrapping as w;
 use rand_core::{impls, le, Error, RngCore, SeedableRng};
-use std::fmt::Display;
 
 /// An Xorshift random number generator.
 ///
@@ -11,7 +10,7 @@ use std::fmt::Display;
 /// [^1]: Marsaglia, George (July 2003).
 ///       ["Xorshift RNGs"](https://www.jstatsoft.org/v08/i14/paper).
 ///       *Journal of Statistical Software*. Vol. 8 (Issue 14).
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Default, PartialEq, Eq)]
 pub struct XorShiftRng {
     x: w<u32>,
     y: w<u32>,
@@ -88,7 +87,7 @@ impl SeedableRng for XorShiftRng {
     }
 }
 
-impl Display for XorShiftRng {
+impl std::fmt::Debug for XorShiftRng {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,

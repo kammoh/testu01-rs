@@ -19,16 +19,12 @@ pub mod xorshift;
 
 use rand::{rngs::ThreadRng, Rng};
 use rand_core::SeedableRng;
-use testu01::{swrite, battery::{small_crush, fips_140_2, crush}};
-use testu01::unif01::{Unif01Gen, Unif01Pair};
+use testu01::unif01::Unif01Gen;
+use testu01::{
+    battery::{crush, fips_140_2, small_crush},
+    swrite,
+};
 use xorshift::XorShiftRng;
-
-// XorShiftRng doesn't implement the Debug trait but we want to print its
-// internal state.
-// This is an ugly hack to access his private members and print them.
-fn write(gen: &mut XorShiftRng) {
-    println!("{}", gen);
-}
 
 fn main() {
     swrite::set_experiment_name("Test of rust weak rng with small crush");
@@ -38,29 +34,30 @@ fn main() {
     let mut thread_rng = ThreadRng::default();
 
     let seed = thread_rng.gen::<[u8; 16]>(); // The seed of the generator
-    let xor_shift_rng: XorShiftRng = XorShiftRng::from_seed(seed); // The generator that will be tested.
+    let mut xor_shift_rng: XorShiftRng = XorShiftRng::from_seed(seed); // The generator that will be tested.
 
     // Build an object than can  be converted to something that TestU01 can test:
-    let mut xorshift_unif01 = Unif01Gen::new(Unif01Pair(xor_shift_rng, write), "weak_rng");
+    let mut xorshift_unif01 = Unif01Gen::new(&mut xor_shift_rng, "XorShiftRng");
 
     // Apply the small crush battery to it:
-    small_crush(&mut xorshift_unif01);
-
+    // let results = small_crush(&mut xorshift_unif01);
+    let results = fips_140_2(&mut xorshift_unif01);
 
     // Print the p-values for the differents test of the battery:
-    let p_values = testu01::battery::get_pvalues();
     println!("Small Crush P-values:\n----------------------------------");
 
-    for (key, value) in &p_values {
+    for (key, value) in &results.p_values {
         println!("{:25} {:.6}", key, value);
     }
 
+    let results = fips_140_2(&mut xorshift_unif01);
+    println!("NIST-140-2 P-values:\n----------------------------------");
 
-    // fips_140_2(&mut xorshift_unif01);
-    // let p_values = testu01::battery::get_pvalues();
-    // println!("NIST-140-2 P-values:\n----------------------------------");
+    for (key, value) in &results.p_values {
+        println!("{:25} {:.6}", key, value);
+    }
 
-    // for (key, value) in &p_values {
-    //     println!("{:25} {:.6}", key, value);
-    // }
+    for (key, passed) in &results.passed {
+        println!("{:25} {}", key, if *passed { "PASSED" } else { "FAILED" });
+    }
 }

@@ -35,13 +35,15 @@ macro_rules! wrap {
         wrap!($name, $wrapped, );
     );
    ($name:ident, $wrapped:path, $($arg_name:ident: $arg_type:ty),*) => (
-        pub fn $name<T: crate::unif01::WithRawUnif01Gen>(gen: &mut T, $($arg_name: $arg_type),*) {
+        pub fn $name<T: crate::unif01::WithRawUnif01Gen>(gen: &mut T, $($arg_name: $arg_type),*) -> Results {
+            let _g = GLOBAL_LOCK.lock().unwrap();
             let wrapper = |gen| {
-                let _g = GLOBAL_LOCK.lock().unwrap();
+                // Reset the number of tests to 0
                 unsafe { testu01_sys::bbattery_NTests = 0 };
                 unsafe { $wrapped(gen $(, $arg_name)*) };
             };
             gen.with_raw(wrapper);
+            get_results()
         }
     );
 }
@@ -51,10 +53,13 @@ macro_rules! wrap_file {
         wrap_file!($name, $wrapped, );
     );
     ($name:ident, $wrapped:path, $($arg_name:ident: $arg_type:ty),*) => (
-        pub fn $name(path: &str, $($arg_name: $arg_type),*) {
+        pub fn $name(path: &str, $($arg_name: $arg_type),*) -> Results {
             let path: CString = CString::new(path).unwrap();
             let _g = GLOBAL_LOCK.lock().unwrap();
+            // Reset the number of tests to 0
+            unsafe { testu01_sys::bbattery_NTests = 0 };
             unsafe { $wrapped(path.as_c_str().as_ptr() as *mut _ $(, $arg_name)*) };
+            get_results()
         }
     );
 }
@@ -64,13 +69,18 @@ macro_rules! wrap_rep {
         wrap_rep!($name, $wrapped, $rep, );
     );
     ($name:ident, $wrapped:path, $rep:expr, $($arg_name:ident: $arg_type:ty),*) => (
-        pub fn $name<T: crate::unif01::WithRawUnif01Gen>(gen: &mut T $(, $arg_name: $arg_type)*, rep: &[::libc::c_int]) {
+        pub fn $name<T: crate::unif01::WithRawUnif01Gen>(gen: &mut T $(, $arg_name: $arg_type)*, rep: &[::libc::c_int])  -> Results {
+            let _g = GLOBAL_LOCK.lock().unwrap();
+
+            // Reset the number of tests to 0
+            unsafe { testu01_sys::bbattery_NTests = 0 };
+
             let wrapper = |gen| {
-                let _g = GLOBAL_LOCK.lock().unwrap();
                 unsafe { $wrapped(gen  $(, $arg_name)*, rep.as_ptr() as *mut _) };
             };
             assert!(rep.len() == $rep+1);
             gen.with_raw(wrapper);
+            get_results()
         }
     );
 }
@@ -107,36 +117,59 @@ pub fn repeat_block_alphabit<T: crate::unif01::WithRawUnif01Gen>(
     s: libc::c_int,
     rep: &[::libc::c_int],
     w: libc::c_int,
-) {
-    let wrapper = |gen| {
-        let _g = GLOBAL_LOCK.lock().unwrap();
-        unsafe {
-            testu01_sys::bbattery_RepeatBlockAlphabit(gen, nb, r, s, rep.as_ptr() as *mut _, w)
-        }
+) -> Results {
+    let _g = GLOBAL_LOCK.lock().unwrap();
+
+    // Reset the number of tests to 0
+    unsafe { testu01_sys::bbattery_NTests = 0 };
+
+    let wrapper = |gen| unsafe {
+        testu01_sys::bbattery_RepeatBlockAlphabit(gen, nb, r, s, rep.as_ptr() as *mut _, w)
     };
     assert!(rep.len() == 9 + 1);
     gen.with_raw(wrapper);
+    get_results()
+}
+
+#[derive(Debug, Clone)]
+pub struct Results {
+    pub p_values: HashMap<String, f64>,
+    pub passed: HashMap<String, bool>,
+    // pub test_numbers: HashMap<String, u32>,
+}
+
+impl Results {
+    pub fn with_capacity(capacity: usize) -> Results {
+        Results {
+            p_values: HashMap::with_capacity(capacity),
+            passed: HashMap::with_capacity(capacity),
+        }
+    }
 }
 
 /// Gets the p-values of the tests of the last battery applied.
-pub fn get_pvalues() -> HashMap<String, f64> {
-    let _g = GLOBAL_LOCK.lock().unwrap();
+fn get_results() -> Results {
     let len = unsafe { testu01_sys::bbattery_NTests };
     assert!(len >= 0);
     let len = len as usize;
-    let mut pvalues = HashMap::with_capacity(len);
+    let mut results = Results::with_capacity(len);
     for i in 0..len {
-        let pvalue = unsafe { *testu01_sys::bbattery_pVal.get_unchecked(i) };
-        let name = unsafe {
-            let ptr = testu01_sys::bbattery_TestNames.get_unchecked(i);
-            if (*ptr).is_null() {
-                "".to_string()
-            } else {
-                let name_bytes = CStr::from_ptr(*ptr).to_bytes();
-                str::from_utf8(name_bytes).unwrap_or("").to_string()
-            }
+        let ptr = *unsafe { testu01_sys::bbattery_TestNames.get_unchecked(i) };
+        let name = if ptr.is_null() {
+            "".to_string()
+        } else {
+            // SAFETY: we checked ptr is not NULL
+            let name_bytes = unsafe { CStr::from_ptr(ptr) }.to_bytes();
+            str::from_utf8(name_bytes).unwrap_or("").to_string()
         };
-        pvalues.insert(name, pvalue);
+        let pvalue = *unsafe { testu01_sys::bbattery_pVal.get_unchecked(i) };
+        if pvalue >= 0.0 {
+            results.p_values.insert(name.clone(), pvalue);
+        }
+        let passed: i32 = *unsafe { testu01_sys::bbattery_pass.get_unchecked(i) };
+        if passed >= 0 {
+            results.passed.insert(name, passed == 1);
+        }
     }
-    pvalues
+    results
 }

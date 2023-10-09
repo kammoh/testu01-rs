@@ -4,13 +4,20 @@ use cargo_emit::*;
 use cmake::Config;
 
 fn main() {
-    let dst = Config::new("TestU01")
+    let src_dir = "TestU01";
+    let dst = Config::new(src_dir)
         .profile("Release")
         .cflag("-O3")
         .cflag("-march=native")
         .cflag("-mtune=native")
         .build();
 
+    rerun_if_changed!("wrapper.h");
+    let mut match_options = glob::MatchOptions::new();
+    match_options.case_sensitive = false;
+    for src in glob::glob_with(format!("{}/**/*", src_dir).as_str(), match_options).unwrap() {
+        rerun_if_changed!(src.unwrap().display());
+    }
     rerun_if_changed!("wrapper.h");
 
     rustc_link_search!(format!("{}", dst.join("lib").display()) => "native");

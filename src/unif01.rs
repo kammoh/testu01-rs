@@ -19,7 +19,8 @@
 //! This module allows you to define generators than can be tested by TestU01.
 //! It doesn't covers the rest of the unif01 part of TestU01.
 
-use rand::Rng;
+use rand_core::RngCore;
+
 use std::ffi::CString;
 use std::fmt;
 use std::ptr::null_mut;
@@ -66,13 +67,13 @@ extern "C" fn write_wrapper<T: Unif01Methods>(gen: *mut ::libc::c_void) {
     gen.write();
 }
 
-pub struct Unif01Gen<T> {
-    state: T,
+pub struct Unif01Gen<'a, T> {
+    state: &'a mut T,
     name: CString,
 }
 
-impl<T> Unif01Gen<T> {
-    pub fn new(state: T, name: &str) -> Unif01Gen<T> {
+impl<'a, T> Unif01Gen<'a, T> {
+    pub fn new(state: &'a mut T, name: &str) -> Unif01Gen<'a, T> {
         Unif01Gen {
             state,
             name: CString::new(name).unwrap(),
@@ -80,13 +81,13 @@ impl<T> Unif01Gen<T> {
     }
 }
 
-impl<T: Unif01Methods> WithRawUnif01Gen for Unif01Gen<T> {
+impl<'a, T: Unif01Methods> WithRawUnif01Gen for Unif01Gen<'a, T> {
     fn with_raw<R, F>(&mut self, f: F) -> R
     where
         F: FnOnce(*mut testu01_sys::unif01_Gen) -> R,
     {
         let mut raw = testu01_sys::unif01_Gen {
-            state: &mut self.state as *mut T as *mut ::libc::c_void,
+            state: self.state as *mut T as *mut ::libc::c_void,
             param: null_mut(),
             name: self.name.as_ptr() as *mut _,
             GetU01: Some(get_u01_wrapper::<T>),
@@ -99,7 +100,7 @@ impl<T: Unif01Methods> WithRawUnif01Gen for Unif01Gen<T> {
 
 impl<T> Unif01Methods for T
 where
-    T: Rng + fmt::Debug,
+    T: RngCore + fmt::Debug,
 {
     fn get_u01(&mut self) -> f64 {
         self.next_u32() as f64 * UNIF01_INV32
@@ -110,6 +111,7 @@ where
     }
 
     fn write(&mut self) {
+        // println!("{}", self);
         println!("{:?}", self);
     }
 }
@@ -118,7 +120,7 @@ pub struct Unif01Pair<T, F>(pub T, pub F);
 
 impl<T, F> Unif01Methods for Unif01Pair<T, F>
 where
-    T: Rng,
+    T: RngCore,
     F: FnMut(&mut T),
 {
     fn get_u01(&mut self) -> f64 {
