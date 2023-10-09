@@ -69,8 +69,11 @@ pub struct Unif01Gen<T> {
 }
 
 impl<T> Unif01Gen<T> {
-    pub fn new(state: T, name: CString) -> Unif01Gen<T> {
-        Unif01Gen { state, name }
+    pub fn new(state: T, name: &str) -> Unif01Gen<T> {
+        Unif01Gen {
+            state,
+            name: CString::new(name).unwrap(),
+        }
     }
 }
 

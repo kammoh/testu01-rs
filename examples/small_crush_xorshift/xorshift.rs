@@ -1,4 +1,3 @@
-use core::fmt;
 use core::num::Wrapping as w;
 use rand_core::{impls, le, Error, RngCore, SeedableRng};
 
@@ -11,19 +10,12 @@ use rand_core::{impls, le, Error, RngCore, SeedableRng};
 /// [^1]: Marsaglia, George (July 2003).
 ///       ["Xorshift RNGs"](https://www.jstatsoft.org/v08/i14/paper).
 ///       *Journal of Statistical Software*. Vol. 8 (Issue 14).
-#[derive(Clone, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct XorShiftRng {
     x: w<u32>,
     y: w<u32>,
     z: w<u32>,
     w: w<u32>,
-}
-
-// Custom Debug implementation that does not expose the internal state
-impl fmt::Debug for XorShiftRng {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "XorShiftRng {{}}")
-    }
 }
 
 impl RngCore for XorShiftRng {

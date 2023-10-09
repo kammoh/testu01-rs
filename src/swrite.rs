@@ -39,7 +39,8 @@ wrap!(set_classes, testu01_sys::swrite_Classes);
 wrap!(set_counters, testu01_sys::swrite_Counters);
 wrap!(set_host, testu01_sys::swrite_Host);
 
-pub fn set_experiment_name(name: &CString) {
+pub fn set_experiment_name(name: &str) {
+    let name = &CString::new(name).unwrap();
     let _g = GLOBAL_LOCK.lock().unwrap();
     unsafe { testu01_sys::swrite_SetExperimentName(name.as_ptr() as *mut _) }
 }

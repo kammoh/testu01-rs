@@ -22,7 +22,7 @@
 //! To have more detail about each test and the meaning of each parameters, see
 //! the TestU01 manual.
 
-use std::ffi::CStr;
+use std::{ffi::{CStr, CString}, collections::HashMap};
 use std::str;
 
 use crate::GLOBAL_LOCK;
@@ -47,9 +47,10 @@ macro_rules! wrap_file {
         wrap_file!($name, $wrapped, );
     );
     ($name:ident, $wrapped:path, $($arg_name:ident: $arg_type:ty),*) => (
-        pub fn $name(path: &CStr, $($arg_name: $arg_type),*) {
+        pub fn $name(path: &str, $($arg_name: $arg_type),*) {
+            let path: CString = CString::new(path).unwrap();
             let _g = GLOBAL_LOCK.lock().unwrap();
-            unsafe { $wrapped(path.as_ptr() as *mut _ $(, $arg_name)*) };
+            unsafe { $wrapped(path.as_c_str().as_ptr() as *mut _ $(, $arg_name)*) };
         }
     );
 }
@@ -114,12 +115,12 @@ pub fn repeat_block_alphabit<T: crate::unif01::WithRawUnif01Gen>(
 }
 
 /// Gets the p-values of the tests of the last battery applied.
-pub fn get_pvalues() -> Vec<(String, f64)> {
+pub fn get_pvalues() -> HashMap<String, f64> {
     let _g = GLOBAL_LOCK.lock().unwrap();
     let len = unsafe { testu01_sys::bbattery_NTests };
     assert!(len >= 0);
     let len = len as usize;
-    let mut pvalues = Vec::with_capacity(len);
+    let mut pvalues = HashMap::with_capacity(len);
     for i in 0..len {
         let pvalue = unsafe { *testu01_sys::bbattery_pVal.get_unchecked(i) };
         let name = unsafe {
@@ -131,7 +132,7 @@ pub fn get_pvalues() -> Vec<(String, f64)> {
                 str::from_utf8(name_bytes).unwrap_or("").to_string()
             }
         };
-        pvalues.push((name, pvalue))
+        pvalues.insert(name, pvalue);
     }
     pvalues
 }

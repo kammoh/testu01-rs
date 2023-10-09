@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use std::ffi::CString;
-
 pub mod xorshift;
 
+use rand::{rngs::ThreadRng, Rng};
+use rand_core::SeedableRng;
 use testu01::swrite;
 use testu01::unif01::{Unif01Gen, Unif01Pair};
 use xorshift::XorShiftRng;
@@ -35,17 +35,16 @@ fn write(gen: &mut XorShiftRng) {
 }
 
 fn main() {
-    let experiment_name = "Test of rust weak rng with small crush";
-    swrite::set_experiment_name(&CString::new(experiment_name).unwrap());
+    swrite::set_experiment_name("Test of rust weak rng with small crush");
     swrite::set_host(false); // Disable the printing of the hostname in the results
 
-    let name = "weak_rng";
-    let c_name = CString::new(name).unwrap();
+    let mut thread_rng = ThreadRng::default();
 
-    let rng = XorShiftRng::default(); // The generator that will be tested.
+    let seed = thread_rng.gen::<[u8; 16]>(); // The seed of the generator
+    let xor_shift_rng: XorShiftRng = XorShiftRng::from_seed(seed); // The generator that will be tested.
 
     // Build an object than can  be converted to something that TestU01 can test:
-    let mut xorshift_unif01 = Unif01Gen::new(Unif01Pair(rng, write), c_name);
+    let mut xorshift_unif01 = Unif01Gen::new(Unif01Pair(xor_shift_rng, write), "weak_rng");
 
     // Apply the small crush battery to it:
     testu01::battery::small_crush(&mut xorshift_unif01);
