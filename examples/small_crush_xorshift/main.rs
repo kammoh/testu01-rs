@@ -50,5 +50,10 @@ fn main() {
     testu01::battery::small_crush(&mut xorshift_unif01);
 
     // Print the p-values for the differents test of the battery:
-    println!("P-values: {:?}", testu01::battery::get_pvalues());
+    let p_values = testu01::battery::get_pvalues();
+    println!("P-values:\n----------------------------------");
+
+    for (key, value) in &p_values {
+        println!("{:25} {:.6}", key, value);
+    }
 }
