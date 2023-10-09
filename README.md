@@ -1,13 +1,14 @@
-# rust-testu01
-[![Build Status](https://travis-ci.org/dzamlo/rust-testu01.svg?branch=master)](https://travis-ci.org/dzamlo/rust-testu01)
+# testu01-rs
 
-A rust wrapper to a small subset of [TestU01].
+Fork of [rust-testu01](https://github.com/dzamlo/rust-testu01.git), updated for current Rust versions and using internal sys wrapper crate.
+
+A rust wrapper to a subset of [TestU01].
 [TestU01]: http://simul.iro.umontreal.ca/testu01/tu01.html
 
-To quote his website :
-> TestU01 is a software library, implemented in the ANSI C language, and offering 
-> a collection of utilities for the empirical statistical testing of uniform random
-> number generators.
+
+TestU01 is a software library, implemented in the ANSI C language, and offering 
+a collection of utilities for the empirical statistical testing of uniform random
+number generators.
 
 Currently, this wrapper only covers:
  * building a "object" which conform to the TestU01 "interface" for generators.
@@ -15,6 +16,13 @@ Currently, this wrapper only covers:
 
 In addition to wrapping TestU01 this library provides:
  * Two decorators to help you test your generator more thoroughly. 
+
+## Usage
+
+- Update submodules
+```
+git submodule update --init --recursive
+```
 
 ## Safety
 
@@ -41,8 +49,3 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-## Thanks
-
-In addition to TestU01 authors, I would like to thank some other projects that 
-I used when implementing this wrapper:
- * [rust-bindgen](https://github.com/crabtw/rust-bindgen)
