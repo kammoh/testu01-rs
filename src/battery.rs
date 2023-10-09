@@ -22,8 +22,11 @@
 //! To have more detail about each test and the meaning of each parameters, see
 //! the TestU01 manual.
 
-use std::{ffi::{CStr, CString}, collections::HashMap};
 use std::str;
+use std::{
+    collections::HashMap,
+    ffi::{CStr, CString},
+};
 
 use crate::GLOBAL_LOCK;
 
@@ -35,6 +38,7 @@ macro_rules! wrap {
         pub fn $name<T: crate::unif01::WithRawUnif01Gen>(gen: &mut T, $($arg_name: $arg_type),*) {
             let wrapper = |gen| {
                 let _g = GLOBAL_LOCK.lock().unwrap();
+                unsafe { testu01_sys::bbattery_NTests = 0 };
                 unsafe { $wrapped(gen $(, $arg_name)*) };
             };
             gen.with_raw(wrapper);

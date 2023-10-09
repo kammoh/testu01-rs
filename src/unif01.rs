@@ -24,6 +24,9 @@ use std::ffi::CString;
 use std::fmt;
 use std::ptr::null_mut;
 
+pub const UNIF01_NORM32: f64 = (1u64 << 32) as f64;
+pub const UNIF01_INV32: f64 = 1.0 / UNIF01_NORM32;
+
 /// Any type than can be converted to ffi::raw_unif01_Gen should implement this trait
 pub trait WithRawUnif01Gen {
     fn with_raw<R, F>(&mut self, f: F) -> R
@@ -99,7 +102,7 @@ where
     T: Rng + fmt::Debug,
 {
     fn get_u01(&mut self) -> f64 {
-        self.next_u32() as f64 * (1.0 / 4294967296.0)
+        self.next_u32() as f64 * UNIF01_INV32
     }
 
     fn get_bits(&mut self) -> u32 {
@@ -119,7 +122,7 @@ where
     F: FnMut(&mut T),
 {
     fn get_u01(&mut self) -> f64 {
-        self.0.next_u32() as f64 * (1.0 / 4294967296.0)
+        self.0.next_u32() as f64 * UNIF01_INV32
     }
 
     fn get_bits(&mut self) -> u32 {

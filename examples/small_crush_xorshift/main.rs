@@ -19,7 +19,7 @@ pub mod xorshift;
 
 use rand::{rngs::ThreadRng, Rng};
 use rand_core::SeedableRng;
-use testu01::swrite;
+use testu01::{swrite, battery::{small_crush, fips_140_2, crush}};
 use testu01::unif01::{Unif01Gen, Unif01Pair};
 use xorshift::XorShiftRng;
 
@@ -27,16 +27,13 @@ use xorshift::XorShiftRng;
 // internal state.
 // This is an ugly hack to access his private members and print them.
 fn write(gen: &mut XorShiftRng) {
-    let gen: &(u32, u32, u32, u32) = unsafe { std::mem::transmute(gen) };
-    println!(
-        "x: 0x{:x}, y: 0x{:x}, z: 0x{:x}, w: 0x{:x}",
-        gen.0, gen.1, gen.2, gen.3
-    )
+    println!("{}", gen);
 }
 
 fn main() {
     swrite::set_experiment_name("Test of rust weak rng with small crush");
     swrite::set_host(false); // Disable the printing of the hostname in the results
+    swrite::set_basic(true); // basic = verbose!
 
     let mut thread_rng = ThreadRng::default();
 
@@ -47,13 +44,23 @@ fn main() {
     let mut xorshift_unif01 = Unif01Gen::new(Unif01Pair(xor_shift_rng, write), "weak_rng");
 
     // Apply the small crush battery to it:
-    testu01::battery::small_crush(&mut xorshift_unif01);
+    small_crush(&mut xorshift_unif01);
+
 
     // Print the p-values for the differents test of the battery:
     let p_values = testu01::battery::get_pvalues();
-    println!("P-values:\n----------------------------------");
+    println!("Small Crush P-values:\n----------------------------------");
 
     for (key, value) in &p_values {
         println!("{:25} {:.6}", key, value);
     }
+
+
+    // fips_140_2(&mut xorshift_unif01);
+    // let p_values = testu01::battery::get_pvalues();
+    // println!("NIST-140-2 P-values:\n----------------------------------");
+
+    // for (key, value) in &p_values {
+    //     println!("{:25} {:.6}", key, value);
+    // }
 }

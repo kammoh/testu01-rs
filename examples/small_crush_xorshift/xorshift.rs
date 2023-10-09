@@ -1,5 +1,6 @@
 use core::num::Wrapping as w;
 use rand_core::{impls, le, Error, RngCore, SeedableRng};
+use std::fmt::Display;
 
 /// An Xorshift random number generator.
 ///
@@ -84,5 +85,15 @@ impl SeedableRng for XorShiftRng {
             z: w(u32::from_le_bytes([b[8], b[9], b[10], b[11]])),
             w: w(u32::from_le_bytes([b[12], b[13], b[14], b[15]])),
         })
+    }
+}
+
+impl Display for XorShiftRng {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "x: 0x{:08x}, y: 0x{:08x}, z: 0x{:08x}, w: 0x{:08x}",
+            self.x, self.y, self.z, self.w
+        )
     }
 }
