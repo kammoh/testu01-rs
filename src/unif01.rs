@@ -1,6 +1,7 @@
 // A rust wrapper to a small subset of TestU01
 // (http://simul.iro.umontreal.ca/testu01/tu01.html).
 // Copyright (C) 2015  Loïc Damien
+// Copyright (C) 2023  Kamyar Mohajerani
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,24 +23,6 @@ use rand::Rng;
 use std::ffi::CString;
 use std::fmt;
 use std::ptr::null_mut;
-
-pub mod ffi {
-
-    // /// This struct is what will be handed to TestU01 for testing.
-    // #[allow(non_camel_case_types)]
-    // #[allow(non_snake_case)]
-    // #[repr(C)]
-    // pub struct unif01_Gen {
-    //     pub state: *mut ::libc::c_void,
-    //     pub param: *mut ::libc::c_void,
-    //     pub name: *const ::libc::c_char,
-    //     pub GetU01: Option<extern "C" fn(param: *mut ::libc::c_void, state: *mut ::libc::c_void)
-    // -> ::libc::c_double>,
-    //     pub GetBits: Option<extern "C" fn(param: *mut ::libc::c_void, state: *mut ::libc::c_void)
-    // -> ::libc::c_ulong>,
-    //     pub Write: Option<extern "C" fn(state: *mut ::libc::c_void)>,
-    // }
-}
 
 /// Any type than can be converted to ffi::raw_unif01_Gen should implement this trait
 pub trait WithRawUnif01Gen {

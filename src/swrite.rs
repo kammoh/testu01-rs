@@ -1,6 +1,7 @@
 // A rust wrapper to a small subset of TestU01
 // (http://simul.iro.umontreal.ca/testu01/tu01.html).
 // Copyright (C) 2015  Loïc Damien
+// Copyright (C) 2023  Kamyar Mohajerani
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,43 +23,23 @@
 use crate::GLOBAL_LOCK;
 use std::ffi::CString;
 
-mod ffi {
-    #[allow(non_camel_case_types)]
-    pub type lebool = ::libc::c_int;
-
-    #[link(name = "testu01")]
-    extern "C" {
-        pub static mut swrite_Basic: lebool;
-        pub static mut swrite_Parameters: lebool;
-        pub static mut swrite_Collectors: lebool;
-        pub static mut swrite_Classes: lebool;
-        pub static mut swrite_Counters: lebool;
-        pub static mut swrite_Host: lebool;
-        // pub static mut swrite_ExperimentName: *mut ::libc::c_char;
-    }
-    #[link(name = "testu01")]
-    extern "C" {
-        pub fn swrite_SetExperimentName(Name: *const ::libc::c_char);
-    }
-}
-
 macro_rules! wrap {
     ($name:ident, $wrapped:path) => {
         pub fn $name(value: bool) {
             let _g = GLOBAL_LOCK.lock().unwrap();
-            unsafe { $wrapped = value as ffi::lebool };
+            unsafe { $wrapped = value as testu01_sys::lebool };
         }
     };
 }
 
-wrap!(set_basic, ffi::swrite_Basic);
-wrap!(set_parameters, ffi::swrite_Parameters);
-wrap!(set_collectors, ffi::swrite_Collectors);
-wrap!(set_classes, ffi::swrite_Classes);
-wrap!(set_counters, ffi::swrite_Counters);
-wrap!(set_host, ffi::swrite_Host);
+wrap!(set_basic, testu01_sys::swrite_Basic);
+wrap!(set_parameters, testu01_sys::swrite_Parameters);
+wrap!(set_collectors, testu01_sys::swrite_Collectors);
+wrap!(set_classes, testu01_sys::swrite_Classes);
+wrap!(set_counters, testu01_sys::swrite_Counters);
+wrap!(set_host, testu01_sys::swrite_Host);
 
 pub fn set_experiment_name(name: &CString) {
     let _g = GLOBAL_LOCK.lock().unwrap();
-    unsafe { ffi::swrite_SetExperimentName(name.as_ptr()) }
+    unsafe { testu01_sys::swrite_SetExperimentName(name.as_ptr() as *mut _) }
 }

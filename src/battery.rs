@@ -1,6 +1,7 @@
 // A rust wrapper to a small subset of TestU01
 // (http://simul.iro.umontreal.ca/testu01/tu01.html).
 // Copyright (C) 2015  Loïc Damien
+// Copyright (C) 2023  Kamyar Mohajerani
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

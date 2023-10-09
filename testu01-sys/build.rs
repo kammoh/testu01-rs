@@ -20,6 +20,7 @@ fn main() {
         .header("wrapper.h")
         .allowlist_item("unif01.*")
         .allowlist_item("bbattery.*")
+        .allowlist_item("swrite.*")
         .clang_arg(format!("-I{}", dst.join("include").display()))
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
