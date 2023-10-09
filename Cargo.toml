@@ -1,15 +1,19 @@
+[workspace]
+members = [".", "testu01-sys", "SP800-90B-sys"]
+resolver = "2"
+
 [package]
 name = "testu01"
-version = "0.0.1"
-authors = ["Loïc Damien <loic.damien@dzamlo.ch>"]
-
-[features]
-nightly = ["i128_support"]
-i128_support = ["rand/i128_support"]
+version = "0.1.0"
+authors = ["Loïc Damien <loic.damien@dzamlo.ch>", "Kamyar Mohajerani <kammoh@gmail.com>"]
+edition = "2021"
 
 [dependencies]
-lazy_static = "0.1.15"
-libc = "0.2.0"
-rand = { path = "/home/pitdicker/rust/rand" }
-rand_core = { path = "/home/pitdicker/rust/rand/rand_core" }
+testu01-sys = { path = "testu01-sys" }
+lazy_static = "1.4.0"
+libc = "0.2.149"
+rand = "0.8.5"
+rand_core = "0.6.4"
 
+[build-dependencies]
+cargo-emit = "0.2.1"

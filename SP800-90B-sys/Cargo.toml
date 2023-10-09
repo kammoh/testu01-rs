@@ -1,0 +1,12 @@
+[package]
+name = "SP800-90B-sys"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[build-dependencies]
+bindgen = "0.68.1"
+cargo-emit = "0.2.1"

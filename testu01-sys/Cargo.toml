@@ -1,0 +1,21 @@
+[package]
+name = "testu01-sys"
+authors = ["Kamyar Mohajerani <kammoh@gmail.com>"]
+version = "0.1.0"
+description = "Native bindings to the testu01"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# autocxx = "0.26.0"
+# cxx = "1.0.107"
+# miette = { version = "5.10.0", features = ["fancy"] }
+
+[build-dependencies]
+# autocxx-build = "0.26.0"
+bindgen = "0.68.1"
+cargo-emit = "0.2.1"
+cmake = "0.1.50"
+glob = "0.3.1"
+# miette = { version = "5.10.0", features = ["fancy"] }

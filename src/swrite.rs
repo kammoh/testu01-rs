@@ -19,6 +19,7 @@
 //! what is printed when
 //! tests are run.
 
+use crate::GLOBAL_LOCK;
 use std::ffi::CString;
 
 mod ffi {
@@ -26,28 +27,28 @@ mod ffi {
     pub type lebool = ::libc::c_int;
 
     #[link(name = "testu01")]
-    extern {
+    extern "C" {
         pub static mut swrite_Basic: lebool;
         pub static mut swrite_Parameters: lebool;
         pub static mut swrite_Collectors: lebool;
         pub static mut swrite_Classes: lebool;
         pub static mut swrite_Counters: lebool;
         pub static mut swrite_Host: lebool;
-    // pub static mut swrite_ExperimentName: *mut ::libc::c_char;
+        // pub static mut swrite_ExperimentName: *mut ::libc::c_char;
     }
     #[link(name = "testu01")]
-    extern {
-        pub fn swrite_SetExperimentName(Name: *const ::libc::c_char) -> ();
+    extern "C" {
+        pub fn swrite_SetExperimentName(Name: *const ::libc::c_char);
     }
 }
 
 macro_rules! wrap {
-    ($name:ident, $wrapped:path) => (
+    ($name:ident, $wrapped:path) => {
         pub fn $name(value: bool) {
-            let _g = ::GLOBAL_LOCK.lock().unwrap();
+            let _g = GLOBAL_LOCK.lock().unwrap();
             unsafe { $wrapped = value as ffi::lebool };
         }
-    );
+    };
 }
 
 wrap!(set_basic, ffi::swrite_Basic);
@@ -58,6 +59,6 @@ wrap!(set_counters, ffi::swrite_Counters);
 wrap!(set_host, ffi::swrite_Host);
 
 pub fn set_experiment_name(name: &CString) {
-    let _g = ::GLOBAL_LOCK.lock().unwrap();
+    let _g = GLOBAL_LOCK.lock().unwrap();
     unsafe { ffi::swrite_SetExperimentName(name.as_ptr()) }
 }

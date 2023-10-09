@@ -1,0 +1,6 @@
+[submodule "testu01-sys/TestU01"]
+	path = testu01-sys/TestU01
+	url = https://github.com/kammoh/TestU01.git
+[submodule "SP800-90B-sys/SP800-90B_EntropyAssessment"]
+	path = SP800-90B-sys/SP800-90B_EntropyAssessment
+	url = https://github.com/kammoh/SP800-90B_EntropyAssessment.git

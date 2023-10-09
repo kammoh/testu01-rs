@@ -21,9 +21,6 @@
 
 #[macro_use]
 extern crate lazy_static;
-extern crate libc;
-extern crate rand;
-extern crate rand_core;
 
 use std::sync::Mutex;
 
@@ -33,7 +30,7 @@ lazy_static! {
     static ref GLOBAL_LOCK: Mutex<()> = Mutex::new(());
 }
 
-pub mod decorators;
 pub mod battery;
-pub mod unif01;
+pub mod decorators;
 pub mod swrite;
+pub mod unif01;
