@@ -22,25 +22,24 @@
 //! To have more detail about each test and the meaning of each parameters, see
 //! the TestU01 manual.
 
-use std::str;
-use std::{
-    collections::HashMap,
-    ffi::{CStr, CString},
-};
+use std::ffi::{CStr, CString};
 
 use crate::GLOBAL_LOCK;
+use testu01_sys::sentrop_Res;
+
+use indexmap::IndexMap;
 
 macro_rules! wrap {
-    ($name:ident, $wrapped:path) => (
+    ($name:ident, $wrapped:ident) => (
         wrap!($name, $wrapped, );
     );
-   ($name:ident, $wrapped:path, $($arg_name:ident: $arg_type:ty),*) => (
-        pub fn $name<T: crate::unif01::WithRawUnif01Gen>(gen: &mut T, $($arg_name: $arg_type),*) -> Results {
-            let _g = GLOBAL_LOCK.lock().unwrap();
+   ($name:ident, $wrapped:ident, $($arg_name:ident: $arg_type:ty),*) => (
+        pub fn $name<T: $crate::unif01::WithRawUnif01Gen>(gen: &mut T, $($arg_name: $arg_type),*) -> BatteryResults {
+            let _g = $crate::GLOBAL_LOCK.lock().unwrap();
             let wrapper = |gen| {
                 // Reset the number of tests to 0
                 unsafe { testu01_sys::bbattery_NTests = 0 };
-                unsafe { $wrapped(gen $(, $arg_name)*) };
+                unsafe { testu01_sys::$wrapped(gen $(, $arg_name)*) };
             };
             gen.with_raw(wrapper);
             get_results()
@@ -49,118 +48,144 @@ macro_rules! wrap {
 }
 
 macro_rules! wrap_file {
-    ($name:ident, $wrapped:path) => (
+    ($name:ident, $wrapped:ident) => (
         wrap_file!($name, $wrapped, );
     );
-    ($name:ident, $wrapped:path, $($arg_name:ident: $arg_type:ty),*) => (
-        pub fn $name(path: &str, $($arg_name: $arg_type),*) -> Results {
+    ($name:ident, $wrapped:ident, $($arg_name:ident: $arg_type:ty),*) => (
+        pub fn $name(path: &str, $($arg_name: $arg_type),*) -> BatteryResults {
             let path: CString = CString::new(path).unwrap();
-            let _g = GLOBAL_LOCK.lock().unwrap();
+            let _g = $crate::GLOBAL_LOCK.lock().unwrap();
             // Reset the number of tests to 0
             unsafe { testu01_sys::bbattery_NTests = 0 };
-            unsafe { $wrapped(path.as_c_str().as_ptr() as *mut _ $(, $arg_name)*) };
+            unsafe { testu01_sys::$wrapped(path.as_c_str().as_ptr() as *mut _ $(, $arg_name)*) };
             get_results()
         }
     );
 }
 
-macro_rules! wrap_rep {
-    ($name:ident, $wrapped:path, $rep:expr) => (
-        wrap_rep!($name, $wrapped, $rep, );
+macro_rules! wrap_repeat {
+    ($name:ident, $wrapped:ident, $num_repeats:expr ) => (
+        wrap_repeat!($name, $wrapped, $num_repeats, );
     );
-    ($name:ident, $wrapped:path, $rep:expr, $($arg_name:ident: $arg_type:ty),*) => (
-        pub fn $name<T: crate::unif01::WithRawUnif01Gen>(gen: &mut T $(, $arg_name: $arg_type)*, rep: &[::libc::c_int])  -> Results {
+    ($name:ident, $wrapped:ident, $num_repeats:expr, $($arg_name:ident: $arg_type:ty),* $(; $xarg_name:ident: $xarg_type:ty )? ) => (
+        pub fn $name<T: $crate::unif01::WithRawUnif01Gen>(gen: &mut T $(, $arg_name: $arg_type)*, rep: &mut [::libc::c_int] $(,$xarg_name: $xarg_type)? ) -> BatteryResults {
+            assert!(rep.len() > $num_repeats, "rep.len() must be at least {}", $num_repeats+1);
             let _g = GLOBAL_LOCK.lock().unwrap();
 
             // Reset the number of tests to 0
             unsafe { testu01_sys::bbattery_NTests = 0 };
 
             let wrapper = |gen| {
-                unsafe { $wrapped(gen  $(, $arg_name)*, rep.as_ptr() as *mut _) };
+                unsafe { testu01_sys::$wrapped(gen  $(, $arg_name)*, rep.as_ptr() as *mut _ $(, $xarg_name)? ) };
             };
-            assert!(rep.len() == $rep+1);
             gen.with_raw(wrapper);
             get_results()
         }
     );
 }
 
-wrap!(small_crush, testu01_sys::bbattery_SmallCrush);
-wrap_file!(small_crush_file, testu01_sys::bbattery_SmallCrushFile);
-wrap_rep!(
-    repeat_small_crush,
-    testu01_sys::bbattery_RepeatSmallCrush,
-    10
-);
-wrap!(crush, testu01_sys::bbattery_Crush);
-wrap_rep!(repeat_crush, testu01_sys::bbattery_RepeatCrush, 96);
-wrap!(big_crush, testu01_sys::bbattery_BigCrush);
-wrap_rep!(repeat_big_crush, testu01_sys::bbattery_RepeatBigCrush, 106);
-wrap!(rabbit, testu01_sys::bbattery_Rabbit, nb: libc::c_double);
-wrap_file!(rabbit_file, testu01_sys::bbattery_RabbitFile, nb: libc::c_double);
-wrap_rep!(repeat_rabbit, testu01_sys::bbattery_RepeatRabbit, 26, nb: libc::c_double);
-wrap!(alphabit, testu01_sys::bbattery_Alphabit, nb: libc::c_double, r: libc::c_int, s: libc::c_int);
-wrap_file!(alphabit_file, testu01_sys::bbattery_AlphabitFile, nb: libc::c_double);
-wrap_rep!(repeat_alphabit, testu01_sys::bbattery_RepeatAlphabit, 9, nb: libc::c_double, r: libc::c_int, s: libc::c_int);
-wrap!(block_alphabit, testu01_sys::bbattery_BlockAlphabit, nb: libc::c_double, r: libc::c_int, s: libc::c_int);
-wrap_file!(block_alphabit_file, testu01_sys::bbattery_BlockAlphabitFile, nb: libc::c_double);
-wrap!(pseudo_diehard, testu01_sys::bbattery_pseudoDIEHARD);
-wrap!(fips_140_2, testu01_sys::bbattery_FIPS_140_2);
-wrap_file!(fips_140_2_file, testu01_sys::bbattery_FIPS_140_2File);
+wrap!(crush, bbattery_Crush);
+wrap!(small_crush, bbattery_SmallCrush);
+wrap!(big_crush, bbattery_BigCrush);
+wrap!(rabbit, bbattery_Rabbit, nb: libc::c_double);
+wrap!(alphabit, bbattery_Alphabit, nb: libc::c_double, r: libc::c_int, s: libc::c_int);
+wrap!(block_alphabit, bbattery_BlockAlphabit, nb: libc::c_double, r: libc::c_int, s: libc::c_int);
+wrap!(pseudo_diehard, bbattery_pseudoDIEHARD);
+wrap!(fips_140_2, bbattery_FIPS_140_2);
+wrap_file!(rabbit_file, bbattery_RabbitFile, nb: libc::c_double);
+wrap_file!(alphabit_file, bbattery_AlphabitFile, nb: libc::c_double);
+wrap_file!(block_alphabit_file, bbattery_BlockAlphabitFile, nb: libc::c_double);
+wrap_file!(fips_140_2_file, bbattery_FIPS_140_2File);
+wrap_repeat!(repeat_crush, bbattery_RepeatCrush, 96);
+wrap_repeat!(repeat_big_crush, bbattery_RepeatBigCrush, 106);
+wrap_repeat!(repeat_rabbit, bbattery_RepeatRabbit, 26, nb: libc::c_double);
+wrap_repeat!(repeat_alphabit, bbattery_RepeatAlphabit, 9, nb: libc::c_double, r: libc::c_int, s: libc::c_int);
+wrap_repeat!(repeat_block_alphabit, bbattery_RepeatBlockAlphabit, 9, nb: libc::c_double, r: libc::c_int, s: libc::c_int ; w: libc::c_int);
+wrap_repeat!(repeat_small_crush, bbattery_RepeatSmallCrush, 10);
 
-// Not using wrap_rep! because bbattery_RepeatBlockAlphabit want another
-// argument after the rep argument.
-pub fn repeat_block_alphabit<T: crate::unif01::WithRawUnif01Gen>(
+/**
+ *
+ *  Applies\index{Test!EntropyDiscOver} an entropy-based test
+  described in \cite{rLEC96e}, similar
+  to {\tt sentrop\_EntropyDisc}, but with overlap of the blocks.
+  It constructs a sequence of $n$ bits, by taking $s$ bits from each
+  of $n/s$ output values, puts these $n$ bits on a circle,
+  and examines all $n$ blocks of $L$ successive bits on this circle.
+  The test computes the empirical entropy, defined by
+   $$ T = -\sum_{i = 0}^{k-1} X_i \log_2 X_i, $$
+  where the $X_i$ are the observed frequencies of the $L$-bit strings.
+  This test is equivalent to {\tt smultin\_MultinomialBitsOver} with the
+  power divergence test statistic, using $\delta=0$ only.
+%  Note: This is different from {\tt smultin\_MultinomialOver}
+%  unless $s=1$, because here the overlapping is for sequences of {\em bits}.
+
+  For $N>1$, the function also tests the empirical correlation
+  between pairs of successive values of $T$, as well as the average
+  of these values.  This average is compared with the exact expectation
+  in the cases where it is known.
+  Restrictions:  r <= 31, s < 31, n <= 31, L <= n/2, n mod s = 0, and N >> n.
+ */
+pub fn entropy_disc<T: crate::unif01::WithRawUnif01Gen>(
     gen: &mut T,
-    nb: libc::c_double,
-    r: libc::c_int,
-    s: libc::c_int,
-    rep: &[::libc::c_int],
-    w: libc::c_int,
-) -> Results {
+    pairs: libc::c_long,
+    num_blocks: libc::c_long,
+    drop_bits: libc::c_int,
+    take_bits: libc::c_int,
+    block_bits: libc::c_int,
+) {
+    // assert!(
+    //     drop_bits <= 31
+    //         && take_bits < 31
+    //         && num_blocks <= 31
+    //         && block_bits <= (num_blocks / 2) as libc::c_int
+    //         && (num_blocks as libc::c_int % take_bits as libc::c_int == 0)
+    //         && pairs > num_blocks
+    // );
     let _g = GLOBAL_LOCK.lock().unwrap();
 
-    // Reset the number of tests to 0
-    unsafe { testu01_sys::bbattery_NTests = 0 };
+    // let res: *mut sentrop_Res = unsafe { testu01_sys::sentrop_CreateRes() };
+    // assert!(!res.is_null());
+
+    let res: *mut sentrop_Res = std::ptr::null_mut() as _;
 
     let wrapper = |gen| unsafe {
-        testu01_sys::bbattery_RepeatBlockAlphabit(gen, nb, r, s, rep.as_ptr() as *mut _, w)
+        testu01_sys::sentrop_EntropyDisc(
+            gen, res, pairs, num_blocks, drop_bits, take_bits, block_bits,
+        );
     };
-    assert!(rep.len() == 9 + 1);
     gen.with_raw(wrapper);
-    get_results()
 }
 
 #[derive(Debug, Clone)]
-pub struct Results {
-    pub p_values: HashMap<String, f64>,
-    pub passed: HashMap<String, bool>,
+pub struct BatteryResults {
+    pub p_values: IndexMap<String, f64>,
+    pub passed: IndexMap<String, bool>,
     // pub test_numbers: HashMap<String, u32>,
 }
 
-impl Results {
-    pub fn with_capacity(capacity: usize) -> Results {
-        Results {
-            p_values: HashMap::with_capacity(capacity),
-            passed: HashMap::with_capacity(capacity),
+impl BatteryResults {
+    pub fn with_capacity(capacity: usize) -> BatteryResults {
+        BatteryResults {
+            p_values: IndexMap::with_capacity(capacity),
+            passed: IndexMap::with_capacity(capacity),
         }
     }
 }
 
 /// Gets the p-values of the tests of the last battery applied.
-fn get_results() -> Results {
+fn get_results() -> BatteryResults {
     let len = unsafe { testu01_sys::bbattery_NTests };
     assert!(len >= 0);
     let len = len as usize;
-    let mut results = Results::with_capacity(len);
+    let mut results = BatteryResults::with_capacity(len);
     for i in 0..len {
         let ptr = *unsafe { testu01_sys::bbattery_TestNames.get_unchecked(i) };
         let name = if ptr.is_null() {
             "".to_string()
         } else {
-            // SAFETY: we checked ptr is not NULL
+            // SAFETY: we already checked that `ptr` is not NULL
             let name_bytes = unsafe { CStr::from_ptr(ptr) }.to_bytes();
-            str::from_utf8(name_bytes).unwrap_or("").to_string()
+            std::str::from_utf8(name_bytes).unwrap_or("").to_string()
         };
         let pvalue = *unsafe { testu01_sys::bbattery_pVal.get_unchecked(i) };
         if pvalue >= 0.0 {

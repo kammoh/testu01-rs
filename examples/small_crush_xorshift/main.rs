@@ -19,10 +19,11 @@ pub mod xorshift;
 
 use rand::{rngs::ThreadRng, Rng};
 use rand_core::SeedableRng;
-use testu01::unif01::Unif01Gen;
+
 use testu01::{
-    battery::{crush, fips_140_2, small_crush},
+    battery::{fips_140_2, small_crush},
     swrite,
+    unif01::Unif01Gen,
 };
 use xorshift::XorShiftRng;
 
@@ -39,25 +40,29 @@ fn main() {
     // Build an object than can  be converted to something that TestU01 can test:
     let mut xorshift_unif01 = Unif01Gen::new(&mut xor_shift_rng, "XorShiftRng");
 
-    // Apply the small crush battery to it:
-    // let results = small_crush(&mut xorshift_unif01);
-    let results = fips_140_2(&mut xorshift_unif01);
+    // entropy_disc(&mut xorshift_unif01, 0, 1, 0, 10, 10);
+    if true {
+        let results = small_crush(&mut xorshift_unif01);
+        // Print the p-values for the differents test of the battery:
+        println!("Small Crush P-values:\n----------------------------------");
 
-    // Print the p-values for the differents test of the battery:
-    println!("Small Crush P-values:\n----------------------------------");
-
-    for (key, value) in &results.p_values {
-        println!("{:25} {:.6}", key, value);
+        for (key, value) in &results.p_values {
+            println!("{:25} {:.6}", key, value);
+        }
     }
 
-    let results = fips_140_2(&mut xorshift_unif01);
-    println!("NIST-140-2 P-values:\n----------------------------------");
+    if true {
+        let results = fips_140_2(&mut xorshift_unif01);
+        println!("NIST-140-2 P-values:\n----------------------------------");
 
-    for (key, value) in &results.p_values {
-        println!("{:25} {:.6}", key, value);
-    }
+        for (key, value) in &results.p_values {
+            println!("{:25} {:.6}", key, value);
+        }
+        println!();
 
-    for (key, passed) in &results.passed {
-        println!("{:25} {}", key, if *passed { "PASSED" } else { "FAILED" });
+        println!("NIST-140-2 status:\n----------------------------------");
+        for (key, passed) in &results.passed {
+            println!("{:25} {}", key, if *passed { "PASS" } else { "FAIL" });
+        }
     }
 }
