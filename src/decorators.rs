@@ -19,7 +19,7 @@
 //! help you test
 //! your random number generators more thoroughly.
 
-use rand::Rng;
+use rand::{Rng, RngCore, Error};
 
 
 /// A generator that reverse the order of the bits produced by another generator.
@@ -60,7 +60,7 @@ fn reverse_bits64(bits: u64) -> u64 {
     bits
 }
 
-impl<T: Rng> Rng for ReverseBits<T> {
+impl<T: Rng> RngCore for ReverseBits<T> {
     #[inline]
     fn next_u32(&mut self) -> u32 {
         reverse_bits32(self.rng.next_u32())
@@ -69,6 +69,19 @@ impl<T: Rng> Rng for ReverseBits<T> {
     #[inline]
     fn next_u64(&mut self) -> u64 {
         reverse_bits64(self.rng.next_u64())
+    }
+
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        self.rng.fill_bytes(dest);
+        dest.reverse();
+        dest.iter_mut().for_each(|x| *x = x.reverse_bits());
+    }
+
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
+        self.rng.try_fill_bytes(dest)?;
+        dest.reverse();
+        dest.iter_mut().for_each(|x| *x = x.reverse_bits());
+        Ok(())
     }
 }
 
@@ -92,7 +105,7 @@ impl<T: Rng> Rng64To32<T> {
     }
 }
 
-impl<T: Rng> Rng for Rng64To32<T> {
+impl<T: Rng> RngCore for Rng64To32<T> {
     #[inline]
     fn next_u32(&mut self) -> u32 {
         if let Some(n) = self.lower_half {
@@ -103,6 +116,18 @@ impl<T: Rng> Rng for Rng64To32<T> {
             self.lower_half = Some(n as u32);
             (n >> 32) as u32
         }
+    }
+
+    fn next_u64(&mut self) -> u64 {
+        self.rng.next_u64()
+    }
+
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        self.rng.fill_bytes(dest);
+    }
+
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
+        self.rng.try_fill_bytes(dest)
     }
 }
 

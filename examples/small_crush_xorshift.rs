@@ -17,8 +17,11 @@
 
 extern crate testu01;
 extern crate rand;
+extern crate rand_xorshift;
 
 use std::ffi::CString;
+use rand::SeedableRng;
+use rand_xorshift::XorShiftRng;
 
 use testu01::unif01::{Unif01Gen, Unif01Pair};
 use testu01::swrite;
@@ -26,7 +29,7 @@ use testu01::swrite;
 // XorShiftRng doesn't implement the Debug trait but we want to print its
 // internal state.
 // This is an ugly hack to access his private members and print them.
-fn write(gen: &mut rand::XorShiftRng) {
+fn write(gen: &mut XorShiftRng) {
     let gen: &(u32, u32, u32, u32) = unsafe { std::mem::transmute(gen) };
     println!("x: 0x{:x}, y: 0x{:x}, z: 0x{:x}, w: 0x{:x}",
              gen.0,
@@ -43,7 +46,7 @@ fn main() {
     let name = "weak_rng";
     let c_name = CString::new(name).unwrap();
 
-    let rng = rand::XorShiftRng::new_unseeded(); // The generator that will be tested.
+    let rng = XorShiftRng::from_seed([0; 16]); // The generator that will be tested.
 
     // Build an object than can  be converted to something that TestU01 can test:
     let mut xorshift_unif01 = Unif01Gen::new(Unif01Pair(rng, write), c_name);
