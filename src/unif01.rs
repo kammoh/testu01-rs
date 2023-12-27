@@ -21,7 +21,7 @@
 use std::ffi::CString;
 use std::fmt;
 use std::ptr::null_mut;
-use rand::Rng;
+use rand::{Rng, RngCore};
 
 pub mod ffi {
 
@@ -110,7 +110,7 @@ impl<T: Unif01Methods> WithRawUnif01Gen for Unif01Gen<T> {
 }
 
 
-impl<T> Unif01Methods for T where T: Rng+fmt::Debug {
+impl<T> Unif01Methods for T where T: RngCore + fmt::Debug {
     fn get_u01(&mut self) -> f64 {
         self.gen::<f64>()
     }
@@ -126,7 +126,7 @@ impl<T> Unif01Methods for T where T: Rng+fmt::Debug {
 
 pub struct Unif01Pair<T, F>(pub T, pub F);
 
-impl<T, F> Unif01Methods for Unif01Pair<T,F> where T: Rng, F: FnMut(&mut T) {
+impl<T, F> Unif01Methods for Unif01Pair<T,F> where T: RngCore, F: FnMut(&mut T) {
     fn get_u01(&mut self) -> f64 {
         self.0.gen::<f64>()
     }
