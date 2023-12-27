@@ -19,7 +19,7 @@
 //! help you test
 //! your random number generators more thoroughly.
 
-use rand::{Rng, RngCore, Error};
+use rand::{RngCore, Error};
 
 
 /// A generator that reverse the order of the bits produced by another generator.
@@ -27,11 +27,11 @@ use rand::{Rng, RngCore, Error};
 /// It seems that TestU01 is biased toward the most significant bits. Reversing the order of the
 /// bits allow you to detect more flaws in generators.
 #[derive(Debug)]
-pub struct ReverseBits<T: Rng> {
+pub struct ReverseBits<T: RngCore> {
     pub rng: T,
 }
 
-impl<T: Rng> ReverseBits<T> {
+impl<T: RngCore> ReverseBits<T> {
     pub fn new(rng: T) -> ReverseBits<T> {
         ReverseBits { rng: rng }
     }
@@ -60,7 +60,7 @@ fn reverse_bits64(bits: u64) -> u64 {
     bits
 }
 
-impl<T: Rng> RngCore for ReverseBits<T> {
+impl<T: RngCore> RngCore for ReverseBits<T> {
     #[inline]
     fn next_u32(&mut self) -> u32 {
         reverse_bits32(self.rng.next_u32())
@@ -91,12 +91,12 @@ impl<T: Rng> RngCore for ReverseBits<T> {
 /// TestU01 is a 32 bits test suite. You can use this decorator to transform a 64 bits generator
 /// to a 32 bit generator that use all 64 bits of it.
 #[derive(Debug)]
-pub struct Rng64To32<T: Rng> {
+pub struct Rng64To32<T: RngCore> {
     pub rng: T,
     lower_half: Option<u32>,
 }
 
-impl<T: Rng> Rng64To32<T> {
+impl<T: RngCore> Rng64To32<T> {
     pub fn new(rng: T) -> Rng64To32<T> {
         Rng64To32 {
             rng: rng,
@@ -105,7 +105,7 @@ impl<T: Rng> Rng64To32<T> {
     }
 }
 
-impl<T: Rng> RngCore for Rng64To32<T> {
+impl<T: RngCore> RngCore for Rng64To32<T> {
     #[inline]
     fn next_u32(&mut self) -> u32 {
         if let Some(n) = self.lower_half {
