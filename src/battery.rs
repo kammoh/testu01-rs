@@ -21,61 +21,75 @@
 //! To have more detail about each test and the meaning of each parameters, see
 //! the TestU01 manual.
 
-
 use std::ffi::CStr;
 use std::str;
 
 mod ffi {
     #[link(name = "testu01")]
-    extern {
+    extern "C" {
         pub static mut bbattery_NTests: ::libc::c_int;
         pub static mut bbattery_pVal: [::libc::c_double; 0];
         pub static mut bbattery_TestNames: [*const ::libc::c_char; 0];
     }
 
     #[link(name = "testu01")]
-    extern {
+    extern "C" {
         pub fn bbattery_SmallCrush(gen: *mut ::unif01::ffi::raw_unif01_Gen);
         pub fn bbattery_SmallCrushFile(filename: *const ::libc::c_char);
-        pub fn bbattery_RepeatSmallCrush(gen: *mut ::unif01::ffi::raw_unif01_Gen,
-                                         rep: *const ::libc::c_int);
+        pub fn bbattery_RepeatSmallCrush(
+            gen: *mut ::unif01::ffi::raw_unif01_Gen,
+            rep: *const ::libc::c_int,
+        );
         pub fn bbattery_Crush(gen: *mut ::unif01::ffi::raw_unif01_Gen);
-        pub fn bbattery_RepeatCrush(gen: *mut ::unif01::ffi::raw_unif01_Gen,
-                                    rep: *const ::libc::c_int);
+        pub fn bbattery_RepeatCrush(
+            gen: *mut ::unif01::ffi::raw_unif01_Gen,
+            rep: *const ::libc::c_int,
+        );
         pub fn bbattery_BigCrush(gen: *mut ::unif01::ffi::raw_unif01_Gen);
-        pub fn bbattery_RepeatBigCrush(gen: *mut ::unif01::ffi::raw_unif01_Gen,
-                                       rep: *const ::libc::c_int);
+        pub fn bbattery_RepeatBigCrush(
+            gen: *mut ::unif01::ffi::raw_unif01_Gen,
+            rep: *const ::libc::c_int,
+        );
         pub fn bbattery_Rabbit(gen: *mut ::unif01::ffi::raw_unif01_Gen, nb: ::libc::c_double);
         pub fn bbattery_RabbitFile(filename: *const ::libc::c_char, nb: ::libc::c_double);
-        pub fn bbattery_RepeatRabbit(gen: *mut ::unif01::ffi::raw_unif01_Gen,
-                                     nb: ::libc::c_double,
-                                     rep: *const ::libc::c_int);
-        pub fn bbattery_Alphabit(gen: *mut ::unif01::ffi::raw_unif01_Gen,
-                                 nb: ::libc::c_double,
-                                 r: ::libc::c_int,
-                                 s: ::libc::c_int);
+        pub fn bbattery_RepeatRabbit(
+            gen: *mut ::unif01::ffi::raw_unif01_Gen,
+            nb: ::libc::c_double,
+            rep: *const ::libc::c_int,
+        );
+        pub fn bbattery_Alphabit(
+            gen: *mut ::unif01::ffi::raw_unif01_Gen,
+            nb: ::libc::c_double,
+            r: ::libc::c_int,
+            s: ::libc::c_int,
+        );
         pub fn bbattery_AlphabitFile(filename: *const ::libc::c_char, nb: ::libc::c_double);
-        pub fn bbattery_RepeatAlphabit(gen: *mut ::unif01::ffi::raw_unif01_Gen,
-                                       nb: ::libc::c_double,
-                                       r: ::libc::c_int,
-                                       s: ::libc::c_int,
-                                       rep: *const ::libc::c_int);
-        pub fn bbattery_BlockAlphabit(gen: *mut ::unif01::ffi::raw_unif01_Gen,
-                                      nb: ::libc::c_double,
-                                      r: ::libc::c_int,
-                                      s: ::libc::c_int);
+        pub fn bbattery_RepeatAlphabit(
+            gen: *mut ::unif01::ffi::raw_unif01_Gen,
+            nb: ::libc::c_double,
+            r: ::libc::c_int,
+            s: ::libc::c_int,
+            rep: *const ::libc::c_int,
+        );
+        pub fn bbattery_BlockAlphabit(
+            gen: *mut ::unif01::ffi::raw_unif01_Gen,
+            nb: ::libc::c_double,
+            r: ::libc::c_int,
+            s: ::libc::c_int,
+        );
         pub fn bbattery_BlockAlphabitFile(filename: *const ::libc::c_char, nb: ::libc::c_double);
-        pub fn bbattery_RepeatBlockAlphabit(gen: *mut ::unif01::ffi::raw_unif01_Gen,
-                                            nb: ::libc::c_double,
-                                            r: ::libc::c_int,
-                                            s: ::libc::c_int,
-                                            rep: *const ::libc::c_int,
-                                            w: ::libc::c_int);
+        pub fn bbattery_RepeatBlockAlphabit(
+            gen: *mut ::unif01::ffi::raw_unif01_Gen,
+            nb: ::libc::c_double,
+            r: ::libc::c_int,
+            s: ::libc::c_int,
+            rep: *const ::libc::c_int,
+            w: ::libc::c_int,
+        );
         pub fn bbattery_pseudoDIEHARD(gen: *mut ::unif01::ffi::raw_unif01_Gen);
         pub fn bbattery_FIPS_140_2(gen: *mut ::unif01::ffi::raw_unif01_Gen);
         pub fn bbattery_FIPS_140_2File(filename: *const ::libc::c_char);
     }
-
 }
 
 macro_rules! wrap {
@@ -142,12 +156,14 @@ wrap_file!(fips_140_2_file, ffi::bbattery_FIPS_140_2File);
 
 // Not using wrap_rep! because bbattery_RepeatBlockAlphabit want another
 // argument after the rep argument.
-pub fn repeat_block_alphabit<T: ::unif01::WithRawUnif01Gen>(gen: &mut T,
-                                                            nb: ::libc::c_double,
-                                                            r: ::libc::c_int,
-                                                            s: ::libc::c_int,
-                                                            rep: &[::libc::c_int],
-                                                            w: ::libc::c_int) {
+pub fn repeat_block_alphabit<T: ::unif01::WithRawUnif01Gen>(
+    gen: &mut T,
+    nb: ::libc::c_double,
+    r: ::libc::c_int,
+    s: ::libc::c_int,
+    rep: &[::libc::c_int],
+    w: ::libc::c_int,
+) {
     let wrapper = |gen: &mut ::unif01::ffi::raw_unif01_Gen| {
         let _g = ::GLOBAL_LOCK.lock().unwrap();
         unsafe { ffi::bbattery_RepeatBlockAlphabit(gen, nb, r, s, rep.as_ptr(), w) }

@@ -15,27 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-extern crate testu01;
 extern crate rand;
 extern crate rand_xorshift;
+extern crate testu01;
 
 use std::ffi::CString;
+
 use rand::SeedableRng;
 use rand_xorshift::XorShiftRng;
-
-use testu01::unif01::{Unif01Gen, Unif01Pair};
 use testu01::swrite;
+use testu01::unif01::{Unif01Gen, Unif01Pair};
 
 // XorShiftRng doesn't implement the Debug trait but we want to print its
 // internal state.
 // This is an ugly hack to access his private members and print them.
 fn write(gen: &mut XorShiftRng) {
     let gen: &(u32, u32, u32, u32) = unsafe { std::mem::transmute(gen) };
-    println!("x: 0x{:x}, y: 0x{:x}, z: 0x{:x}, w: 0x{:x}",
-             gen.0,
-             gen.1,
-             gen.2,
-             gen.3)
+    println!(
+        "x: 0x{:x}, y: 0x{:x}, z: 0x{:x}, w: 0x{:x}",
+        gen.0, gen.1, gen.2, gen.3
+    )
 }
 
 fn main() {

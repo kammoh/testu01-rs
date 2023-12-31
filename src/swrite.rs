@@ -26,28 +26,28 @@ mod ffi {
     pub type lebool = ::libc::c_int;
 
     #[link(name = "testu01")]
-    extern {
+    extern "C" {
         pub static mut swrite_Basic: lebool;
         pub static mut swrite_Parameters: lebool;
         pub static mut swrite_Collectors: lebool;
         pub static mut swrite_Classes: lebool;
         pub static mut swrite_Counters: lebool;
         pub static mut swrite_Host: lebool;
-    // pub static mut swrite_ExperimentName: *mut ::libc::c_char;
+        // pub static mut swrite_ExperimentName: *mut ::libc::c_char;
     }
     #[link(name = "testu01")]
-    extern {
+    extern "C" {
         pub fn swrite_SetExperimentName(Name: *const ::libc::c_char) -> ();
     }
 }
 
 macro_rules! wrap {
-    ($name:ident, $wrapped:path) => (
+    ($name:ident, $wrapped:path) => {
         pub fn $name(value: bool) {
             let _g = ::GLOBAL_LOCK.lock().unwrap();
             unsafe { $wrapped = value as ffi::lebool };
         }
-    );
+    };
 }
 
 wrap!(set_basic, ffi::swrite_Basic);

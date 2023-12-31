@@ -30,7 +30,7 @@ lazy_static! {
     static ref GLOBAL_LOCK: Mutex<()> = Mutex::new(());
 }
 
-pub mod decorators;
 pub mod battery;
-pub mod unif01;
+pub mod decorators;
 pub mod swrite;
+pub mod unif01;

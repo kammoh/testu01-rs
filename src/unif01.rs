@@ -21,6 +21,7 @@
 use std::ffi::CString;
 use std::fmt;
 use std::ptr::null_mut;
+
 use rand::{Rng, RngCore};
 
 pub mod ffi {
@@ -33,19 +34,28 @@ pub mod ffi {
         pub state: *mut ::libc::c_void,
         pub param: *mut ::libc::c_void,
         pub name: *const ::libc::c_char,
-        pub GetU01: Option<extern "C" fn(param: *mut ::libc::c_void, state: *mut ::libc::c_void)
-    -> ::libc::c_double>,
-        pub GetBits: Option<extern "C" fn(param: *mut ::libc::c_void, state: *mut ::libc::c_void)
-    -> ::libc::c_ulong>,
+        pub GetU01: Option<
+            extern "C" fn(
+                param: *mut ::libc::c_void,
+                state: *mut ::libc::c_void,
+            ) -> ::libc::c_double,
+        >,
+        pub GetBits: Option<
+            extern "C" fn(
+                param: *mut ::libc::c_void,
+                state: *mut ::libc::c_void,
+            ) -> ::libc::c_ulong,
+        >,
         pub Write: Option<extern "C" fn(state: *mut ::libc::c_void)>,
     }
 }
 
 /// Any type than can be converted to ffi::raw_unif01_Gen should implement this trait
 pub trait WithRawUnif01Gen {
-    fn with_raw<R, F>(&mut self, f: F) -> R where F: FnOnce(&mut ffi::raw_unif01_Gen) -> R;
+    fn with_raw<R, F>(&mut self, f: F) -> R
+    where
+        F: FnOnce(&mut ffi::raw_unif01_Gen) -> R;
 }
-
 
 pub trait Unif01Methods {
     /// Return a floating point number in the range [0, 1).
@@ -58,16 +68,18 @@ pub trait Unif01Methods {
     fn write(&mut self);
 }
 
-extern "C" fn get_u01_wrapper<T: Unif01Methods>(_param: *mut ::libc::c_void,
-                                                gen: *mut ::libc::c_void)
-                                                -> ::libc::c_double {
+extern "C" fn get_u01_wrapper<T: Unif01Methods>(
+    _param: *mut ::libc::c_void,
+    gen: *mut ::libc::c_void,
+) -> ::libc::c_double {
     let gen: &mut T = unsafe { &mut *(gen as *mut T) };
     gen.get_u01() as ::libc::c_double
 }
 
-extern "C" fn get_bits_wrapper<T: Unif01Methods>(_param: *mut ::libc::c_void,
-                                                 gen: *mut ::libc::c_void)
-                                                 -> ::libc::c_ulong {
+extern "C" fn get_bits_wrapper<T: Unif01Methods>(
+    _param: *mut ::libc::c_void,
+    gen: *mut ::libc::c_void,
+) -> ::libc::c_ulong {
     let gen: &mut T = unsafe { &mut *(gen as *mut T) };
     gen.get_bits() as ::libc::c_ulong
 }
@@ -77,25 +89,21 @@ extern "C" fn write_wrapper<T: Unif01Methods>(gen: *mut ::libc::c_void) {
     gen.write();
 }
 
-
 pub struct Unif01Gen<T> {
     state: T,
     name: CString,
 }
 
 impl<T> Unif01Gen<T> {
-
     pub fn new(state: T, name: CString) -> Unif01Gen<T> {
-        Unif01Gen {
-            state: state,
-            name: name,
-        }
+        Unif01Gen { state, name }
     }
 }
 
 impl<T: Unif01Methods> WithRawUnif01Gen for Unif01Gen<T> {
     fn with_raw<R, F>(&mut self, f: F) -> R
-        where F: FnOnce(&mut ffi::raw_unif01_Gen) -> R
+    where
+        F: FnOnce(&mut ffi::raw_unif01_Gen) -> R,
     {
         let mut raw = ffi::raw_unif01_Gen {
             state: &mut self.state as *mut T as *mut ::libc::c_void,
@@ -109,8 +117,10 @@ impl<T: Unif01Methods> WithRawUnif01Gen for Unif01Gen<T> {
     }
 }
 
-
-impl<T> Unif01Methods for T where T: RngCore + fmt::Debug {
+impl<T> Unif01Methods for T
+where
+    T: RngCore + fmt::Debug,
+{
     fn get_u01(&mut self) -> f64 {
         self.gen::<f64>()
     }
@@ -126,7 +136,11 @@ impl<T> Unif01Methods for T where T: RngCore + fmt::Debug {
 
 pub struct Unif01Pair<T, F>(pub T, pub F);
 
-impl<T, F> Unif01Methods for Unif01Pair<T,F> where T: RngCore, F: FnMut(&mut T) {
+impl<T, F> Unif01Methods for Unif01Pair<T, F>
+where
+    T: RngCore,
+    F: FnMut(&mut T),
+{
     fn get_u01(&mut self) -> f64 {
         self.0.gen::<f64>()
     }

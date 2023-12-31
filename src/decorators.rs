@@ -19,8 +19,7 @@
 //! help you test
 //! your random number generators more thoroughly.
 
-use rand::{RngCore, Error};
-
+use rand::{Error, RngCore};
 
 /// A generator that reverse the order of the bits produced by another generator.
 ///
@@ -33,7 +32,7 @@ pub struct ReverseBits<T: RngCore> {
 
 impl<T: RngCore> ReverseBits<T> {
     pub fn new(rng: T) -> ReverseBits<T> {
-        ReverseBits { rng: rng }
+        ReverseBits { rng }
     }
 }
 
@@ -99,7 +98,7 @@ pub struct Rng64To32<T: RngCore> {
 impl<T: RngCore> Rng64To32<T> {
     pub fn new(rng: T) -> Rng64To32<T> {
         Rng64To32 {
-            rng: rng,
+            rng,
             lower_half: None,
         }
     }
@@ -135,10 +134,12 @@ impl<T: RngCore> RngCore for Rng64To32<T> {
 mod test {
     #[test]
     fn test_reverse32() {
-        let foo = [(0x80000000, 0x00000001),
-                   (0x6b7c265b, 0xda643ed6),
-                   (0xda643ed6, 0x6b7c265b),
-                   (0xbc96c03d, 0xbc03693d)];
+        let foo = [
+            (0x80000000, 0x00000001),
+            (0x6b7c265b, 0xda643ed6),
+            (0xda643ed6, 0x6b7c265b),
+            (0xbc96c03d, 0xbc03693d),
+        ];
         for &(bits, expected) in foo.iter() {
             assert_eq!(super::reverse_bits32(bits), expected);
         }
@@ -146,10 +147,12 @@ mod test {
 
     #[test]
     fn test_reverse64() {
-        let foo = [(0x8000000000000000, 0x0000000000000001),
-                   (0x08f58f42407f4819, 0x9812fe0242f1af10),
-                   (0xda643ed600000000, 0x000000006b7c265b),
-                   (0x00000000bc96c03d, 0xbc03693d00000000)];
+        let foo = [
+            (0x8000000000000000, 0x0000000000000001),
+            (0x08f58f42407f4819, 0x9812fe0242f1af10),
+            (0xda643ed600000000, 0x000000006b7c265b),
+            (0x00000000bc96c03d, 0xbc03693d00000000),
+        ];
         for &(bits, expected) in foo.iter() {
             assert_eq!(super::reverse_bits64(bits), expected);
         }
