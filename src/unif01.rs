@@ -74,6 +74,11 @@ pub struct Unif01Gen<'a, T> {
 
 impl<'a, T> Unif01Gen<'a, T> {
     pub fn new(state: &'a mut T, name: &str) -> Unif01Gen<'a, T> {
+        let name = if name.is_empty() {
+            std::any::type_name::<T>()
+        } else {
+            name
+        };
         Unif01Gen {
             state,
             name: CString::new(name).unwrap(),

@@ -20,7 +20,10 @@
 //! help you test
 //! your random number generators more thoroughly.
 
-use rand::{Error, Rng, RngCore};
+use rand::Rng;
+
+use rand_core::impls;
+use rand_core::{Error, RngCore};
 
 /// A generator that reverse the order of the bits produced by another generator.
 ///
@@ -71,15 +74,16 @@ impl<T: RngCore> RngCore for ReverseBits<T> {
 
     #[cfg(feature = "i128_support")]
     fn next_u128(&mut self) -> u128 {
-        panic!()
-    }
-
-    fn fill_bytes(&mut self, _dest: &mut [u8]) {
         todo!()
     }
 
-    fn try_fill_bytes(&mut self, _dest: &mut [u8]) -> Result<(), Error> {
-        todo!()
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        impls::fill_bytes_via_next(self, dest)
+    }
+
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
+        self.fill_bytes(dest);
+        Ok(())
     }
 }
 
