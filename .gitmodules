@@ -1,6 +1,3 @@
-[submodule "testu01-sys/TestU01"]
-	path = testu01-sys/TestU01
-	url = https://github.com/kammoh/TestU01.git
 [submodule "SP800-90B-sys/SP800-90B_EntropyAssessment"]
 	path = SP800-90B-sys/SP800-90B_EntropyAssessment
 	url = https://github.com/kammoh/SP800-90B_EntropyAssessment.git
@@ -13,3 +10,6 @@
 [submodule "NIST-Statistical-Test-Suite"]
 	path = NIST-Statistical-Test-Suite
 	url = https://github.com/terrillmoore/NIST-Statistical-Test-Suite.git
+[submodule "testu01-sys/TestU01"]
+	path = testu01-sys/TestU01
+	url = https://github.com/kammoh/TestU01.git
