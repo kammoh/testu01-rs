@@ -10,3 +10,6 @@
 [submodule "practrand-sys/PractRand"]
 	path = practrand-sys/PractRand
 	url = https://github.com/kammoh/PractRand.git
+[submodule "NIST-Statistical-Test-Suite"]
+	path = NIST-Statistical-Test-Suite
+	url = https://github.com/terrillmoore/NIST-Statistical-Test-Suite.git

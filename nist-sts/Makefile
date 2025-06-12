@@ -1,5 +1,4 @@
-CC = /usr/bin/gcc
-GCCFLAGS = -c -Wall
+CFLAGS += -O3 -march=native -mtune=native -g0 -Wall
 ROOTDIR = .
 SRCDIR = $(ROOTDIR)/src
 OBJDIR = $(ROOTDIR)/obj
@@ -22,71 +21,71 @@ $(OBJDIR)/assess.o: $(SRCDIR)/assess.c defs.h decls.h utilities.h
 	$(CC) -o $@ -c $(SRCDIR)/assess.c
 
 $(OBJDIR)/frequency.o: $(SRCDIR)/frequency.c defs.h externs.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/frequency.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/frequency.c
 
 $(OBJDIR)/blockFrequency.o: $(SRCDIR)/blockFrequency.c defs.h externs.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/blockFrequency.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/blockFrequency.c
 
 $(OBJDIR)/cusum.o: $(SRCDIR)/cusum.c defs.h externs.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/cusum.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/cusum.c
 
 $(OBJDIR)/runs.o: $(SRCDIR)/runs.c defs.h externs.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/runs.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/runs.c
 
 $(OBJDIR)/longestRunOfOnes.o: $(SRCDIR)/longestRunOfOnes.c defs.h externs.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/longestRunOfOnes.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/longestRunOfOnes.c
 
 $(OBJDIR)/rank.o: $(SRCDIR)/rank.c defs.h externs.h matrix.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/rank.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/rank.c
 
 $(OBJDIR)/discreteFourierTransform.o: $(SRCDIR)/discreteFourierTransform.c \
         defs.h externs.h utilities.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/discreteFourierTransform.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/discreteFourierTransform.c
 
 $(OBJDIR)/nonOverlappingTemplateMatchings.o: \
         $(SRCDIR)/nonOverlappingTemplateMatchings.c defs.h externs.h utilities.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/nonOverlappingTemplateMatchings.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/nonOverlappingTemplateMatchings.c
 
 $(OBJDIR)/overlappingTemplateMatchings.o: \
         $(SRCDIR)/overlappingTemplateMatchings.c defs.h externs.h utilities.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/overlappingTemplateMatchings.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/overlappingTemplateMatchings.c
 
 $(OBJDIR)/universal.o: $(SRCDIR)/universal.c defs.h externs.h utilities.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/universal.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/universal.c
 
 $(OBJDIR)/approximateEntropy.o: $(SRCDIR)/approximateEntropy.c defs.h externs.h utilities.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/approximateEntropy.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/approximateEntropy.c
 
 $(OBJDIR)/randomExcursions.o: $(SRCDIR)/randomExcursions.c defs.h externs.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/randomExcursions.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/randomExcursions.c
 
 $(OBJDIR)/randomExcursionsVariant.o: $(SRCDIR)/randomExcursionsVariant.c defs.h externs.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/randomExcursionsVariant.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/randomExcursionsVariant.c
 
 $(OBJDIR)/serial.o: $(SRCDIR)/serial.c defs.h externs.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/serial.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/serial.c
 
 $(OBJDIR)/linearComplexity.o: $(SRCDIR)/linearComplexity.c defs.h externs.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/linearComplexity.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/linearComplexity.c
 
 $(OBJDIR)/dfft.o: $(SRCDIR)/dfft.c
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/dfft.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/dfft.c
 
 $(OBJDIR)/matrix.o: $(SRCDIR)/matrix.c defs.h externs.h utilities.h matrix.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/matrix.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/matrix.c
 
 $(OBJDIR)/genutils.o: $(SRCDIR)/genutils.c config.h genutils.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/genutils.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/genutils.c
 
 $(OBJDIR)/cephes.o: $(SRCDIR)/cephes.c cephes.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/cephes.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/cephes.c
 
 $(OBJDIR)/utilities.o: $(SRCDIR)/utilities.c defs.h externs.h utilities.h config.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/utilities.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/utilities.c
 
 $(OBJDIR)/generators.o: $(SRCDIR)/generators.c defs.h externs.h utilities.h \
         config.h generators.h
-	$(CC) -o $@ $(GCCFLAGS) $(SRCDIR)/generators.c
+	$(CC) -o $@ $(CFLAGS) -c $(SRCDIR)/generators.c
 
 clean:
 	rm -f assess $(OBJDIR)/*.o

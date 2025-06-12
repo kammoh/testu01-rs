@@ -23,7 +23,7 @@
 use rand::Rng;
 
 use rand_core::impls;
-use rand_core::{Error, RngCore};
+use rand_core::RngCore;
 
 /// A generator that reverse the order of the bits produced by another generator.
 ///
@@ -72,18 +72,8 @@ impl<T: RngCore> RngCore for ReverseBits<T> {
         reverse_bits64(self.rng.next_u64())
     }
 
-    #[cfg(feature = "i128_support")]
-    fn next_u128(&mut self) -> u128 {
-        todo!()
-    }
-
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         impls::fill_bytes_via_next(self, dest)
-    }
-
-    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
-        self.fill_bytes(dest);
-        Ok(())
     }
 }
 
@@ -124,17 +114,8 @@ impl<T: RngCore> RngCore for Rng64To32<T> {
         self.rng.next_u64()
     }
 
-    #[cfg(feature = "i128_support")]
-    fn next_u128(&mut self) -> u128 {
-        panic!()
-    }
-
     fn fill_bytes(&mut self, _dest: &mut [u8]) {
         panic!()
-    }
-
-    fn try_fill_bytes(&mut self, _dest: &mut [u8]) -> Result<(), Error> {
-        todo!()
     }
 }
 

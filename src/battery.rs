@@ -179,7 +179,7 @@ fn get_results() -> BatteryResults {
     let len = len as usize;
     let mut results = BatteryResults::with_capacity(len);
     for i in 0..len {
-        let ptr = *unsafe { testu01_sys::bbattery_TestNames.get_unchecked(i) };
+        let ptr = unsafe { testu01_sys::bbattery_TestNames[i] };
         let name = if ptr.is_null() {
             "".to_string()
         } else {
@@ -187,11 +187,11 @@ fn get_results() -> BatteryResults {
             let name_bytes = unsafe { CStr::from_ptr(ptr) }.to_bytes();
             std::str::from_utf8(name_bytes).unwrap_or("").to_string()
         };
-        let pvalue = *unsafe { testu01_sys::bbattery_pVal.get_unchecked(i) };
+        let pvalue = unsafe { testu01_sys::bbattery_pVal[i] };
         if pvalue >= 0.0 {
             results.p_values.insert(name.clone(), pvalue);
         }
-        let passed: i32 = *unsafe { testu01_sys::bbattery_pass.get_unchecked(i) };
+        let passed: i32 = unsafe { testu01_sys::bbattery_pass[i] };
         if passed >= 0 {
             results.passed.insert(name, passed == 1);
         }
