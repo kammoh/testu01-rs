@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "testu01-sys", "SP800-90B-sys", "practrand-sys"]
+members = [".", "testu01-sys", "practrand-sys"]
 resolver = "2"
 
 [package]
